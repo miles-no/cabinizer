@@ -2,7 +2,7 @@
 
 (defmacro defstyled [name styles args & body]
   `(def ~name
-     (raffle.material-ui.styles/with-style
-       ~styles
+     (raffle.material-ui.styles/wrap
        ^{:displayName ~(str name)}
-       (fn ~args ~@body))))
+       (fn ~args ~@body)
+       ~styles)))

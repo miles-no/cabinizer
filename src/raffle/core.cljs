@@ -11,20 +11,19 @@
 (def cards [1 2 3 4 5])
 
 (defn style [theme]
-  {:icon        {:margin-right (.spacing theme 2)}
-   :cardGrid    {:padding-top    (.spacing theme 8)
-                 :padding-bottom (.spacing theme 8)}
-   :card        {:height         "100%"
-                 :display        :flex
-                 :flex-direction :column}
-   :cardMedia   {:padding-top "56.25%"}
-   :cardContent {:flex-grow 1}})
+  #js {:icon        #js {:margin-right (.spacing theme 2)}
+       :cardGrid    #js {:padding-top    (.spacing theme 8)
+                         :padding-bottom (.spacing theme 8)}
+       :card        #js {:height         "100%"
+                         :display        :flex
+                         :flex-direction :column}
+       :cardMedia   #js {:padding-top "56.25%"}
+       :cardContent #js {:flex-grow 1}})
 
 (def theme
   (create-theme
-    {:palette
-     {:primary   {:main "#B12F2A"}
-      :secondary {:main "#0C2338"}}}))
+    #js{:palette #js {:primary   #js {:main "#B12F2A"}
+                      :secondary #js {:main "#0C2338"}}}))
 
 (defstyled app style [{:keys [^js classes]}]
   [theme-provider
