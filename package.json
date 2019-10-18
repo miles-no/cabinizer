@@ -3,9 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "server": "shadow-cljs server",
     "dev": "shadow-cljs watch app",
-    "release": "shadow-cljs release app",
-    "server": "shadow-cljs server"
+    "repl": "shadow-cljs cljs-repl app",
+    "release": "shadow-cljs release app"
   },
   "repository": {
     "type": "git",

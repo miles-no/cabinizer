@@ -6,7 +6,14 @@
 (defn create-theme [theme]
   (-> theme clj->js createMuiTheme))
 
-(defn wrap [styles]
+(defn- styles->js [styles]
   (withStyles (comp clj->js styles)))
+
+(defn with-style [styles comp]
+  (let [apply-styles (styles->js styles)]
+    (->> comp
+         (reagent.core/reactify-component)
+         (apply-styles)
+         (reagent.core/adapt-react-class))))
 
 (def theme-provider (r/adapt-react-class ThemeProvider))

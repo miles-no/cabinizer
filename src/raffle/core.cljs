@@ -26,8 +26,7 @@
      {:primary   {:main "#B12F2A"}
       :secondary {:main "#0C2338"}}}))
 
-(defstyled app style [{:keys [classes]}]
-  (js/console.log "app" classes)
+(defstyled app style [{:keys [^js classes]}]
   [theme-provider
    {:theme theme}
    [mui/css-baseline]
@@ -47,8 +46,7 @@
         ^{:key item}
         [card-item {:item item :classes classes}])]]]])
 
-(defn- card-item [{:keys [item classes]}]
-  (js/console.log "item" classes)
+(defn- card-item [{:keys [item ^js classes]}]
   [mui/grid
    {:item true
     :xs   12
