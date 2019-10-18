@@ -1,0 +1,19 @@
+{:source-paths
+ ["src"]
+
+ :nrepl
+ {:port 8777}
+
+ :dependencies
+ [[binaryage/devtools "0.9.10"]
+  [re-frame "0.11.0-rc1"]
+  [reagent "0.9.0-rc2"]]
+
+ :builds
+ {:app
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:main {:init-fn raffle.core/init!}}
+   :devtools   {:http-root "public"
+                :http-port 3000}}}}
