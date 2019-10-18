@@ -4,5 +4,3 @@
     [reagent.core :as r]))
 
 (def house (r/adapt-react-class House))
-
-

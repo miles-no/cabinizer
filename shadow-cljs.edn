@@ -7,6 +7,7 @@
  :dependencies
  [[binaryage/devtools "0.9.10"]
   [re-frame "0.11.0-rc1"]
+  [funcool/bide "1.6.0"]
   [reagent "0.9.0-rc2"]]
 
  :builds

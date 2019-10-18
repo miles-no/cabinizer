@@ -4,6 +4,8 @@
     [raffle.material-ui.styles :refer [create-theme theme-provider]]
     [raffle.material-ui.icons :as icon]
     [raffle.material-ui.core :as mui]
+    [raffle.routing.core :as routing]
+    [raffle.events :as events]
     [re-frame.core :as rf]
     [reagent.core :as r]))
 
@@ -72,7 +74,10 @@
        :color :primary}
       "View"]]]])
 
-(defn mount-app []
+(defn- on-navigate [view]
+  (rf/dispatch [::events/view-changed view]))
+
+(defn- mount-app []
   (r/render [app] (.getElementById js/document "app")))
 
 (defn ^:dev/after-load reload! []
@@ -80,4 +85,6 @@
   (mount-app))
 
 (defn ^:export init! []
+  (rf/dispatch [::events/init])
+  (routing/init! on-navigate)
   (mount-app))
