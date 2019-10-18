@@ -16,5 +16,8 @@
     "@material-ui/icons": "^4.5.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.8.64"
   }
 }
