@@ -77,6 +77,11 @@
 (defn- on-navigate [view]
   (rf/dispatch [::events/view-changed view]))
 
+(defn- dev-setup []
+  (when ^boolean goog.DEBUG
+    (enable-console-print!)
+    (println "Running in dev mode...")))
+
 (defn- mount-app []
   (r/render [app] (.getElementById js/document "app")))
 
@@ -87,4 +92,5 @@
 (defn ^:export init! []
   (rf/dispatch [::events/init])
   (routing/init! on-navigate)
+  (dev-setup)
   (mount-app))
