@@ -10,12 +10,15 @@
     ["@material-ui/core/CardActions" :default CardActions]
     ["@material-ui/core/Container" :default Container]
     ["@material-ui/core/CssBaseline" :default CssBaseline]
+    ["@material-ui/core/IconButton" :default IconButton]
     ["@material-ui/core/Toolbar" :default Toolbar]
     ["@material-ui/core/AppBar" :default AppBar]
+    ["@material-ui/core/Avatar" :default Avatar]
     ["@material-ui/core/Button" :default Button]
     ["@material-ui/core/Card" :default Card]
     ["@material-ui/core/Grid" :default Grid]
     ["@material-ui/core/Link" :default Link]
+    [raffle.google-auth :as auth]
     [raffle.routing.core :as routing]
     [raffle.subs :as subs]
     [raffle.events :as events]
@@ -29,6 +32,7 @@
        :card        #js {:height         "100%"
                          :display        :flex
                          :flex-direction :column}
+       :grow        #js {:flex-grow 1}
        :cardMedia   #js {:padding-top "56.25%"}
        :cardContent #js {:flex-grow 1}})
 
@@ -96,22 +100,42 @@
            :classes classes}])])))
 
 (defstyled app style [{:keys [^js classes]}]
-  [:> ThemeProvider
-   {:theme (create-theme theme)}
-   [:> CssBaseline]
-   [:> AppBar
-    {:position :relative}
-    [:> Toolbar
-     [icon/house
-      {:class (.-icon classes)}]
-     [:> Typography
-      {:variant   :h5
-       :component :h1}
-      "Cabinizer 3000"]]]
-   [:main
-    [:> Container
-     {:max-width :md}
-     [card-grid {:classes classes}]]]])
+  (let [user (rf/subscribe [::subs/user])]
+    [:> ThemeProvider
+     {:theme (create-theme theme)}
+     [:> CssBaseline]
+     [:> AppBar
+      {:position :relative}
+      [:> Toolbar
+       [icon/house
+        {:class (.-icon classes)}]
+       [:> Typography
+        {:variant   :h5
+         :component :h1}
+        "Cabinizer 3000"]
+       [:div {:class (.-grow classes)}]
+       (if @user
+         [:> IconButton
+          {:size "small"}
+          [:> Avatar
+           {:src (:image-url @user)
+            :alt (:name @user)}]]
+         [auth/signin-button
+          {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
+           :on-success (fn [^js/gapi.auth2.GoogleUser user]
+                         (let [profile (.getBasicProfile user)
+                               user    {:family-name (.getFamilyName profile)
+                                        :given-name  (.getGivenName profile)
+                                        :image-url   (.getImageUrl profile)
+                                        :email       (.getEmail profile)
+                                        :name        (.getName profile)
+                                        :id          (.getId profile)}]
+                           (rf/dispatch [::events/user-signed-in user])))
+           :on-failure #(js/console.log %)}])]]
+     [:main
+      [:> Container
+       {:max-width :md}
+       [card-grid {:classes classes}]]]]))
 
 (defn- dev-setup []
   (when ^boolean goog.DEBUG
@@ -126,6 +150,6 @@
   (mount-app))
 
 (defn ^:export init! []
-  (rf/dispatch [::events/init])
+  (rf/dispatch-sync [::events/init])
   (dev-setup)
   (mount-app))

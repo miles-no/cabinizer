@@ -6,3 +6,8 @@
   ::items
   (fn [db _]
     (get db :items [])))
+
+(rf/reg-sub
+  ::user
+  (fn [db _]
+    (get db :user)))

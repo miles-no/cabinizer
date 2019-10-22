@@ -21,3 +21,8 @@
     (merge
       {:db (assoc db :view view)}
       (view->fx view))))
+
+(rf/reg-event-db
+  ::user-signed-in
+  (fn [db [_ user]]
+    (assoc db :user user)))
