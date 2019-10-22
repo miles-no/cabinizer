@@ -1,26 +1,24 @@
 (ns raffle.routing.core
-  (:require
-    [bide.core :as bide]))
+  (:refer-clojure :exclude [resolve])
+  (:require [bide.core :as bide]))
 
 (def ^:private router
   (bide/router [["/" :index]
                 ["/items/:id" :item]]))
 
-(defn navigate!
-  ([id] (navigate! id nil nil))
-  ([id params] (navigate! id params nil))
-  ([id params query] (bide/navigate! router id params query)))
+(def navigate! (partial bide/navigate! router))
 
-(defn replace!
-  ([id] (replace! id nil nil))
-  ([id params] (replace! id params nil))
-  ([id params query] (bide/replace! router id params query)))
+(def replace! (partial bide/replace! router))
+
+(def resolve (partial bide/resolve router))
 
 (defn init! [on-navigate]
-  (bide/start! router {:default     :index
-                       :html5?      true
-                       :on-navigate (fn [id params query]
-                                      (on-navigate
-                                        (merge {:id id}
-                                               (when params {:params params})
-                                               (when query {:query query}))))}))
+  (letfn [(-on-navigate [id params query]
+            (let [view (merge {:id id}
+                         (when params {:params params})
+                         (when query {:query query}))]
+              (on-navigate view)))]
+    (let [options {:default     :index
+                   :html5?      true
+                   :on-navigate -on-navigate}]
+      (bide/start! router options))))

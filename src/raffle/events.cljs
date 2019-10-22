@@ -1,16 +1,18 @@
 (ns raffle.events
   (:require
+    [raffle.routing.fx :as routing]
     [re-frame.core :as rf]
     [raffle.db :as db]))
 
-(rf/reg-event-db
+(rf/reg-event-fx
   ::init
   (fn [_ _]
-    db/initial))
+    {::routing/init #(rf/dispatch [::view-changed %])
+     :db db/initial}))
 
-(defn- view->fx [{:keys [id]}]
-  (cond
-    ;; TODO: Add mapping from views to effects here...
+(defn- view->fx [{:keys [id params]}]
+  (case id
+    :item (println (str "Fetching item " (:id params) " from the server..."))
     :else nil))
 
 (rf/reg-event-fx

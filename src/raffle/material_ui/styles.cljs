@@ -1,9 +1,9 @@
 (ns raffle.material-ui.styles
   (:require
-    ["@material-ui/core/styles" :refer [withStyles createMuiTheme ThemeProvider]]
+    ["@material-ui/core/styles" :refer [withStyles createMuiTheme responsiveFontSizes]]
     [reagent.core :as r]))
 
-(def create-theme createMuiTheme)
+(def create-theme (comp responsiveFontSizes createMuiTheme))
 
 (defn wrap [comp styles]
   (let [with-styles (withStyles styles)]
@@ -11,5 +11,3 @@
          (r/reactify-component)
          (with-styles)
          (r/adapt-react-class))))
-
-(def theme-provider (r/adapt-react-class ThemeProvider))
