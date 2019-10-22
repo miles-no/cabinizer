@@ -13,7 +13,7 @@
 (defn- view->fx [{:keys [id params]}]
   (case id
     :item (println (str "Fetching item " (:id params) " from the server..."))
-    :else nil))
+    nil))
 
 (rf/reg-event-fx
   ::view-changed
