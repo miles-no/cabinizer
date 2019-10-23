@@ -8,7 +8,7 @@
   ::init
   (fn [_ _]
     {::routing/init #(rf/dispatch [::view-changed %])
-     :db db/initial}))
+     :db            db/initial}))
 
 (defn- view->fx [{:keys [id params]}]
   (case id
@@ -22,7 +22,8 @@
       {:db (assoc db :view view)}
       (view->fx view))))
 
-(rf/reg-event-db
+(rf/reg-event-fx
   ::user-signed-in
-  (fn [db [_ user]]
-    (assoc db :user user)))
+  (fn [{:keys [db]} [_ user]]
+    ;; TODO: Pass access-token to server to create a user.
+    {:db (assoc db :user (dissoc user :access-token))}))

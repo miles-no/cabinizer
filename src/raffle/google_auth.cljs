@@ -10,7 +10,7 @@
     out))
 
 (defn- <promise [f & args]
-  (let [out  (a/chan)
+  (let [out (a/chan)
         done (fn [& _] (a/close! out))]
     (.then (apply f args) done done)
     out))
@@ -26,7 +26,8 @@
   (assert client-id)
   (a/go
     (a/<! (<cb js/gapi.load "auth2"))
-    (a/<! (<promise js/gapi.auth2.init #js {:client_id client-id}))))
+    (a/<! (<promise js/gapi.auth2.init #js {:client_id     client-id
+                                            :hosted_domain "miles.no"}))))
 
 (defn- <ensure-gapi! [client-id]
   (a/go
@@ -34,15 +35,18 @@
       (a/<! (<load-script "https://apis.google.com/js/platform.js")))
     (a/<! (<init-gapi! client-id))))
 
+(defn <sign-out! []
+  (<promise #(.signOut (js/gapi.auth2.getAuthInstance))))
+
 (defn- render-signin-button [el {:keys [on-success on-failure]}]
   (js/gapi.signin2.render el
-    #js {:scope     "profile email"
-         :width     240
-         :height    40
-         :longtitle false
-         :theme     "dark"
-         :onsuccess on-success
-         :onfailure on-failure}))
+                          #js {:scope     "https://www.googleapis.com/auth/user.phonenumbers.read"
+                               :width     240
+                               :height    40
+                               :longtitle false
+                               :theme     "dark"
+                               :onsuccess on-success
+                               :onfailure on-failure}))
 
 (defn signin-button [{:keys [client-id on-success on-failure]}]
   (r/create-class
@@ -52,6 +56,6 @@
                               (a/go
                                 (a/<! (<ensure-gapi! client-id))
                                 (render-signin-button el
-                                  {:on-success on-success
-                                   :on-failure on-failure}))))
+                                                      {:on-success on-success
+                                                       :on-failure on-failure}))))
      :reagent-render      (fn [] [:div])}))

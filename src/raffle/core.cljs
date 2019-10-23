@@ -41,20 +41,20 @@
                      :secondary #js {:main "#0C2338"}}})
 
 (defn link-button [{:keys [to params query replace? target] :as props} children]
-  (let [navigate!    (if replace? routing/replace! routing/navigate!)
+  (let [navigate! (if replace? routing/replace! routing/navigate!)
         self-target? (or (nil? target) (= target "_self"))
-        location     (routing/resolve to params query)]
+        location (routing/resolve to params query)]
     (letfn [(-on-click [event]
               (let [left-button? (= (.-button event) 0)
-                    modified?    (or (.-metaKey event) (.-altKey event) (.-ctrlKey event) (.-shiftKey event))]
+                    modified? (or (.-metaKey event) (.-altKey event) (.-ctrlKey event) (.-shiftKey event))]
                 (when (and left-button? self-target? (not modified?))
                   (.preventDefault event)
                   (navigate! to params query))))]
       (let [props* (r/merge-props props
-                     {:on-click  -on-click
-                      :component Link
-                      :target    "_blank"
-                      :href      location})]
+                                  {:on-click  -on-click
+                                   :component Link
+                                   :target    "_blank"
+                                   :href      location})]
         [:> Button props* children]))))
 
 (defn- raffle-item [{:keys [item ^js classes]}]
@@ -124,12 +124,15 @@
           {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
            :on-success (fn [^js/gapi.auth2.GoogleUser user]
                          (let [profile (.getBasicProfile user)
-                               user    {:family-name (.getFamilyName profile)
-                                        :given-name  (.getGivenName profile)
-                                        :image-url   (.getImageUrl profile)
-                                        :email       (.getEmail profile)
-                                        :name        (.getName profile)
-                                        :id          (.getId profile)}]
+                               auth-response (.getAuthResponse user true)
+                               user {:id-token     (.-id_token auth-response)
+                                     :access-token (.-access_token auth-response)
+                                     :family-name  (.getFamilyName profile)
+                                     :given-name   (.getGivenName profile)
+                                     :image-url    (.getImageUrl profile)
+                                     :email        (.getEmail profile)
+                                     :name         (.getName profile)
+                                     :id           (.getId profile)}]
                            (rf/dispatch [::events/user-signed-in user])))
            :on-failure #(js/console.log %)}])]]
      [:main

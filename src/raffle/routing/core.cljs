@@ -15,8 +15,8 @@
 (defn init! [on-navigate]
   (letfn [(-on-navigate [id params query]
             (let [view (merge {:id id}
-                         (when params {:params params})
-                         (when query {:query query}))]
+                              (when params {:params params})
+                              (when query {:query query}))]
               (on-navigate view)))]
     (let [options {:default     :index
                    :html5?      true
