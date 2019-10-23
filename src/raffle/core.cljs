@@ -3,6 +3,7 @@
   (:require
     [raffle.material-ui.styles :refer [create-theme]]
     [raffle.material-ui.icons :as icon]
+    ["@material-ui/core/colors" :refer [amber blue green]]
     ["@material-ui/core/styles" :refer [ThemeProvider]]
     ["@material-ui/core/Typography" :default Typography]
     ["@material-ui/core/CardContent" :default CardContent]
@@ -13,11 +14,15 @@
     ["@material-ui/core/IconButton" :default IconButton]
     ["@material-ui/core/Toolbar" :default Toolbar]
     ["@material-ui/core/AppBar" :default AppBar]
+    ["@material-ui/core/SnackbarContent" :default SnackbarContent]
+    ["@material-ui/core/Snackbar" :default Snackbar]
     ["@material-ui/core/Avatar" :default Avatar]
     ["@material-ui/core/Button" :default Button]
     ["@material-ui/core/Card" :default Card]
     ["@material-ui/core/Grid" :default Grid]
     ["@material-ui/core/Link" :default Link]
+    [raffle.notifications.events :as notification-events]
+    [raffle.notifications.subs :as notification-subs]
     [raffle.google-auth :as auth]
     [raffle.routing.core :as routing]
     [raffle.subs :as subs]
@@ -99,46 +104,89 @@
            :item    item
            :classes classes}])])))
 
-(defstyled app style [{:keys [^js classes]}]
+(def clicks (r/atom 0))
+
+(defn- app-bar [{:keys [^js classes]}]
   (let [user (rf/subscribe [::subs/user])]
-    [:> ThemeProvider
-     {:theme (create-theme theme)}
-     [:> CssBaseline]
-     [:> AppBar
-      {:position :relative}
-      [:> Toolbar
-       [icon/house
-        {:class (.-icon classes)}]
-       [:> Typography
-        {:variant   :h5
-         :component :h1}
-        "Cabinizer 3000"]
-       [:div {:class (.-grow classes)}]
-       (if @user
-         [:> IconButton
-          {:size "small"}
-          [:> Avatar
-           {:src (:image-url @user)
-            :alt (:name @user)}]]
-         [auth/signin-button
-          {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
-           :on-success (fn [^js/gapi.auth2.GoogleUser user]
-                         (let [profile (.getBasicProfile user)
-                               auth-response (.getAuthResponse user true)
-                               user {:id-token     (.-id_token auth-response)
-                                     :access-token (.-access_token auth-response)
-                                     :family-name  (.getFamilyName profile)
-                                     :given-name   (.getGivenName profile)
-                                     :image-url    (.getImageUrl profile)
-                                     :email        (.getEmail profile)
-                                     :name         (.getName profile)
-                                     :id           (.getId profile)}]
-                           (rf/dispatch [::events/user-signed-in user])))
-           :on-failure #(js/console.log %)}])]]
-     [:main
-      [:> Container
-       {:max-width :md}
-       [card-grid {:classes classes}]]]]))
+    [:> AppBar
+     {:position :relative}
+     [:> Toolbar
+      [icon/house
+       {:class (.-icon classes)}]
+      [:> Typography
+       {:variant   :h5
+        :component :h1}
+       "Cabinizer 3000"]
+      [:div {:class (.-grow classes)}]
+      (if @user
+        [:> IconButton
+         {:size     "small"
+          :on-click #(rf/dispatch [::notification-events/show
+                                   {:message (str "Hello " (swap! clicks inc))
+                                    :variant :info}])}
+         [:> Avatar
+          {:src (:image-url @user)
+           :alt (:name @user)}]]
+        [auth/signin-button
+         {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
+          :on-success (fn [^js/gapi.auth2.GoogleUser user]
+                        (let [profile (.getBasicProfile user)
+                              auth-response (.getAuthResponse user true)
+                              user {:id-token     (.-id_token auth-response)
+                                    :access-token (.-access_token auth-response)
+                                    :family-name  (.getFamilyName profile)
+                                    :given-name   (.getGivenName profile)
+                                    :image-url    (.getImageUrl profile)
+                                    :email        (.getEmail profile)
+                                    :name         (.getName profile)
+                                    :id           (.getId profile)}]
+                          (rf/dispatch [::events/user-signed-in user])))
+          :on-failure #(js/console.log %)}])]]))
+
+(def variant-icons
+  {:success icon/check-circle
+   :warning icon/warning
+   :error   icon/error
+   :info    icon/info})
+
+(defn- notification-styles [theme]
+  #js {:success     #js {:background-color (aget green 600)}
+       :error       #js {:background-color (.. theme -palette -error -dark)}
+       :info        #js {:background-color (aget blue 600)}
+       :warning     #js {:background-color (aget amber 700)}
+       :iconVariant #js {:opacity      0.9
+                         :margin-right (.spacing theme 1)}
+       :message     #js {:display     "flex"
+                         :align-items "center"}})
+
+(defstyled notifications notification-styles [{:keys [^js classes]}]
+  (let [notification (rf/subscribe [::notification-subs/notification])
+        {:keys [open? variant] :or {variant :info}} @notification
+        icon (get variant-icons variant)]
+    [:> Snackbar
+     {:anchor-origin #js {:vertical   "bottom"
+                          :horizontal "left"}
+      :open          open?}
+     [:> SnackbarContent
+      (merge {:class (aget classes (name variant))}
+             (apply dissoc @notification [:open? :variant])
+             {:aria-describedby :client-snackbar
+              :message          (r/as-element [:span
+                                               {:id    :client-snackbar
+                                                :class (.-message classes)}
+                                               [icon {:class (.-iconVariant classes)}]
+                                               (:message @notification)])})]]))
+
+(defstyled app style [{:keys [^js classes]}]
+  [:> ThemeProvider
+   {:theme (create-theme theme)}
+   [:> CssBaseline]
+   [app-bar {:classes classes}]
+   [:main
+    [:> Container
+     {:max-width :md}
+     [notifications]
+     [card-grid {:classes classes}]]]])
 
 (defn- dev-setup []
   (when ^boolean goog.DEBUG

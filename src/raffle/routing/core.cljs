@@ -12,7 +12,7 @@
 
 (def resolve (partial bide/resolve router))
 
-(defn init! [on-navigate]
+(defn start! [on-navigate]
   (letfn [(-on-navigate [id params query]
             (let [view (merge {:id id}
                               (when params {:params params})

@@ -14,6 +14,6 @@
     (routing/replace! id params query)))
 
 (rf/reg-fx
-  ::init
+  ::start
   (fn [on-navigate]
-    (routing/init! on-navigate)))
+    (routing/start! on-navigate)))
