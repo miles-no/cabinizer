@@ -24,11 +24,13 @@
     [raffle.notifications.events :as notification-events]
     [raffle.notifications.subs :as notification-subs]
     [raffle.google-auth :as auth]
+    [raffle.api :as api]
     [raffle.routing.core :as routing]
     [raffle.subs :as subs]
     [raffle.events :as events]
     [re-frame.core :as rf]
-    [reagent.core :as r]))
+    [reagent.core :as r]
+    [day8.re-frame.http-fx]))
 
 (defn style [theme]
   #js {:icon        #js {:margin-right (.spacing theme 2)}
@@ -201,6 +203,7 @@
   (mount-app))
 
 (defn ^:export init! []
+  (api/enable-interceptors!)
   (rf/dispatch-sync [::events/init])
   (dev-setup)
   (mount-app))
