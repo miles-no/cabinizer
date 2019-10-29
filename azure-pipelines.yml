@@ -8,9 +8,9 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
+- script: dotnet publish -c $(buildConfiguration) -o artifacts
   workingDirectory: server
-  displayName: 'dotnet build $(buildConfiguration)'
+  displayName: 'dotnet publish $(buildConfiguration)'
 
 - task: AzureRmWebAppDeployment@4
   inputs:
@@ -18,5 +18,5 @@ steps:
     azureSubscription: 'Visual Studio Ultimate with MSDN(c7d15e97-eff8-4f1b-99fd-69cc40c2e13c)'
     appType: 'webAppLinux'
     WebAppName: 'cabinizer'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/artifacts/**/*.zip'
     RuntimeStack: 'DOTNETCORE|3.0'
