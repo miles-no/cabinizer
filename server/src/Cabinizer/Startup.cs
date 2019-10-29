@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text.Json;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -5,9 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 
 namespace Cabinizer
 {
@@ -46,6 +49,16 @@ namespace Cabinizer
                     .Build();
             });
 
+            services.AddEntityFrameworkNpgsql();
+            services.AddEntityFrameworkNpgsqlNodaTime();
+
+            var builder = new NpgsqlConnectionStringBuilder(Configuration.GetConnectionString("Default"))
+            {
+                Password = Configuration["DbPassword"]
+            };
+
+            services.AddDbContext<CabinizerContext>(x => x.UseNpgsql(builder.ConnectionString, y => y.UseNodaTime()));
+
             services.AddMvcCore().AddJsonOptions(x =>
             {
                 x.JsonSerializerOptions.IgnoreNullValues = true;
@@ -71,23 +84,7 @@ namespace Cabinizer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", context =>
-                {
-                    context.Response.ContentType = "application/json";
-
-                    var writer = new Utf8JsonWriter(context.Response.BodyWriter);
-
-                    writer.WriteStartObject();
-
-                    foreach (var claim in context.User.Claims)
-                    {
-                        writer.WriteString(claim.Type, claim.Value);
-                    }
-
-                    writer.WriteEndObject();
-
-                    return writer.FlushAsync();
-                });
+                endpoints.MapControllers();
             });
         }
     }

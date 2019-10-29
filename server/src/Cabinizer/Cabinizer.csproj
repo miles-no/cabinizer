@@ -1,10 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UserSecretsId>0fff4cc0-436c-48df-a48d-174bbb352a81</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Hellang.Authentication.JwtBearer.Google" Version="2.0.0" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="4.0.0-beta.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="3.0.1" />
   </ItemGroup>
 </Project>
