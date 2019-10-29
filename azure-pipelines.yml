@@ -9,10 +9,12 @@ variables:
 
 steps:
   - task: UseDotNet@2
+    displayName: Install .NET Core CLI
     inputs:
       version: 3.0.x
 
   - task: DotNetCoreCLI@2
+    displayName: Restore
     inputs:
       command: restore
       projects: '**/*.csproj'
@@ -25,6 +27,7 @@ steps:
       arguments: '--configuration $(buildConfiguration)'
 
   - task: DotNetCoreCLI@2
+    displayName: Publish
     inputs:
       command: publish
       zipAfterPublish: True
@@ -32,6 +35,7 @@ steps:
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
   - task: AzureWebApp@1
+    displayName: Deploy to Azure
     inputs:
       azureSubscription: 'Visual Studio Ultimate with MSDN(c7d15e97-eff8-4f1b-99fd-69cc40c2e13c)'
       appType: 'webAppLinux'
