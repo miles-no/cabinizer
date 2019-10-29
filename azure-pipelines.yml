@@ -37,7 +37,7 @@ steps:
   - task: AzureWebApp@1
     displayName: Deploy to Azure
     inputs:
-      azureSubscription: 'Visual Studio Ultimate with MSDN(c7d15e97-eff8-4f1b-99fd-69cc40c2e13c)'
-      appType: 'webAppLinux'
       appName: 'cabinizer'
+      appType: 'webAppLinux'
+      azureSubscription: 'cabinizer'
       package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
