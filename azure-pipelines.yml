@@ -11,3 +11,12 @@ steps:
 - script: dotnet build --configuration $(buildConfiguration)
   workingDirectory: server
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Visual Studio Ultimate with MSDN(c7d15e97-eff8-4f1b-99fd-69cc40c2e13c)'
+    appType: 'webAppLinux'
+    WebAppName: 'cabinizer'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|3.0'
