@@ -9,4 +9,5 @@ variables:
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
+  workingDirectory: server
   displayName: 'dotnet build $(buildConfiguration)'
