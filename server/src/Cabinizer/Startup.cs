@@ -59,10 +59,9 @@ namespace Cabinizer
 
             services.AddDbContext<CabinizerContext>(x => x.UseNpgsql(builder.ConnectionString, y => y.UseNodaTime()));
 
-            services.AddMvcCore().AddJsonOptions(x =>
-            {
-                x.JsonSerializerOptions.IgnoreNullValues = true;
-            });
+            services.AddMvcCore()
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true)
+                .ConfigureApiBehaviorOptions(options => options.SuppressMapClientErrors = true);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
