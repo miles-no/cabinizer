@@ -5,6 +5,7 @@ trigger:
   paths:
     include:
       - server
+      - azure-pipelines.yml
 
 pool:
   vmImage: 'ubuntu-latest'
