@@ -31,11 +31,9 @@ steps:
       publishWebProjects: True
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-  - task: AzureRmWebAppDeployment@4
+  - task: AzureWebApp@1
     inputs:
-      ConnectionType: 'AzureRM'
       azureSubscription: 'Visual Studio Ultimate with MSDN(c7d15e97-eff8-4f1b-99fd-69cc40c2e13c)'
       appType: 'webAppLinux'
-      WebAppName: 'cabinizer'
-      packageForLinux: '$(System.DefaultWorkingDirectory)/artifacts/**/*.zip'
-      RuntimeStack: 'DOTNETCORE|3.0'
+      appName: 'cabinizer'
+      package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
