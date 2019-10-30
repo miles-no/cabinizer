@@ -23,6 +23,7 @@
     ["@material-ui/core/Link" :default Link]
     [raffle.notifications.events :as notification-events]
     [raffle.notifications.subs :as notification-subs]
+    [raffle.utilities :refer [debug?]]
     [raffle.google-auth :as auth]
     [raffle.api :as api]
     [raffle.routing.core :as routing]
@@ -127,21 +128,20 @@
                                    {:message (str "Hello " (swap! clicks inc))
                                     :variant :info}])}
          [:> Avatar
-          {:src (:image-url @user)
+          {:src (:pictureUrl @user)
            :alt (:name @user)}]]
         [auth/signin-button
          {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
           :on-success (fn [^js/gapi.auth2.GoogleUser user]
                         (let [profile (.getBasicProfile user)
                               auth-response (.getAuthResponse user true)
-                              user {:id-token     (.-id_token auth-response)
-                                    :access-token (.-access_token auth-response)
-                                    :family-name  (.getFamilyName profile)
-                                    :given-name   (.getGivenName profile)
-                                    :image-url    (.getImageUrl profile)
-                                    :email        (.getEmail profile)
-                                    :name         (.getName profile)
-                                    :id           (.getId profile)}]
+                              user {:idToken     (.-id_token auth-response)
+                                    :accessToken (.-access_token auth-response)
+                                    :familyName  (.getFamilyName profile)
+                                    :givenName   (.getGivenName profile)
+                                    :pictureUrl  (.getImageUrl profile)
+                                    :email       (.getEmail profile)
+                                    :id          (.getId profile)}]
                           (rf/dispatch [::events/user-signed-in user])))
           :on-failure #(js/console.log %)}])]]))
 
@@ -191,7 +191,7 @@
      [card-grid {:classes classes}]]]])
 
 (defn- dev-setup []
-  (when ^boolean goog.DEBUG
+  (when debug?
     (enable-console-print!)
     (println "Running in dev mode...")))
 

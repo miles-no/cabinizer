@@ -10,18 +10,10 @@
   (to-interceptor
     {:name    "Pass Bearer token"
      :request (fn [request]
-                (js/console.log @user)
-                (if-let [token (get @user :id-token)]
+                (if-let [token (get @user :idToken)]
                   (assoc-in request [:headers :Authorization] (str "Bearer " token))
                   request))}))
 
-(def redirect-to-login
-  (to-interceptor
-    {:name     "Redirect to login"
-     :response (fn [response]
-                 (rf/dispatch [::navigate {:name :login}])
-                 response)}))
-
 (defn enable-interceptors! []
   (swap! default-interceptors
-    (partial concat [pass-bearer-token redirect-to-login])))
+    (partial concat [pass-bearer-token])))
