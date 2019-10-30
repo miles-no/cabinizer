@@ -19,6 +19,12 @@ steps:
     inputs:
       version: 3.0.x
 
+  - task: Bash@3
+    displayName: Disable welcome message
+    inputs:
+      targetType: 'inline'
+      script: 'touch "$HOME/.dotnet/$(dotnet --version).dotnetFirstUseSentinel"'
+
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
