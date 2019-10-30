@@ -1,5 +1,4 @@
-using System.Data.Common;
-using System.Text.Json;
+using Cabinizer.Data;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -29,13 +28,15 @@ namespace Cabinizer
             {
                 options.AddDefaultPolicy(policy =>
                 {
+                    policy.AllowAnyHeader();
                     policy.WithOrigins(Configuration.GetSection("Cors:Origins").Get<string[]>());
-                    policy.WithHeaders(Configuration.GetSection("Cors:Headers").Get<string[]>());
                     policy.WithMethods(HttpMethods.Get, HttpMethods.Put, HttpMethods.Post, HttpMethods.Delete);
                 });
             });
 
             services.AddProblemDetails();
+
+            services.AddHttpClient<GoogleClient>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(x => x.UseGoogle(

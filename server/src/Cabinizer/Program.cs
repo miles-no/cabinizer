@@ -1,5 +1,5 @@
-using System;
 using System.Threading.Tasks;
+using Cabinizer.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,14 +19,6 @@ namespace Cabinizer
             await context.Database.EnsureDeletedAsync();
 
             await context.Database.EnsureCreatedAsync();
-
-            await context.Items.AddAsync(new Item
-            {
-                Id = Guid.NewGuid(),
-                Name = "Hytte Tjørhom Panorama",
-            });
-
-            await context.SaveChangesAsync();
 
             await host.RunAsync();
         }
