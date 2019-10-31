@@ -1,88 +1,97 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
+using Google.Apis.Admin.Directory.directory_v1;
+using Google.Apis.Admin.Directory.directory_v1.Data;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Microsoft.Extensions.Configuration;
+using User = Google.Apis.Admin.Directory.directory_v1.Data.User;
 
 namespace Cabinizer
 {
     public class GoogleClient
     {
-        private static readonly Uri GoogleApiUri = new Uri("https://people.googleapis.com/v1/people/me?personFields=phoneNumbers");
+        private const string AdminUserEmail = "miles.ga.admin@miles.no";
 
-        public GoogleClient(HttpClient client, ILogger<GoogleClient> logger)
+        private const string Customer = "my_customer";
+
+        private static readonly string[] Scopes =
         {
-            Client = client;
-            Logger = logger;
+            DirectoryService.Scope.AdminDirectoryUserReadonly,
+            DirectoryService.Scope.AdminDirectoryOrgunitReadonly,
+        };
+
+        public GoogleClient(IConfiguration configuration)
+        {
+            var credential = LoadCredential(configuration["GoogleSecrets"]).CreateWithUser(AdminUserEmail);
+
+            Initializer = new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Miles Events"
+            };
         }
 
-        private HttpClient Client { get; }
+        private BaseClientService.Initializer Initializer { get; }
 
-        private ILogger<GoogleClient> Logger { get; }
-
-        public async Task<IReadOnlyCollection<PhoneNumber>> GetPhoneNumbers(string accessToken, CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<User> GetUsersAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            if (accessToken == null)
+            using var service = new DirectoryService(Initializer);
+
+            var request = service.Users.List();
+
+            request.MaxResults = 200;
+            request.Customer = Customer;
+
+            var response = await request.ExecuteAsync(cancellationToken);
+
+            foreach (var user in response.UsersValue)
             {
-                throw new ArgumentNullException(nameof(accessToken));
+                yield return user;
             }
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, GoogleApiUri);
-
-            request.Headers.Add(HeaderNames.Authorization, $"Bearer {accessToken}");
-
-            using var response = await Client.SendAsync(request, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
+            while (!string.IsNullOrEmpty(response.NextPageToken))
             {
-                Logger.LogWarning("Failed to fetch phone numbers from Google.");
-                return Array.Empty<PhoneNumber>();
-            }
+                request.PageToken = response.NextPageToken;
 
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            using var payload = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+                response = await request.ExecuteAsync(cancellationToken);
 
-            if (payload.RootElement.TryGetProperty("phoneNumbers", out var element))
-            {
-                return ParsePhoneNumbers(element).ToList();
-            }
-
-            return Array.Empty<PhoneNumber>();
-        }
-
-        private static IEnumerable<PhoneNumber> ParsePhoneNumbers(JsonElement element)
-        {
-            foreach (var phoneNumber in element.EnumerateArray())
-            {
-                var canonicalForm = phoneNumber.GetProperty("canonicalForm").GetString();
-
-                var metadata = phoneNumber.GetProperty("metadata");
-
-                var isVerified = metadata.GetProperty("verified").GetBoolean();
-                var isPrimary = metadata.GetProperty("primary").GetBoolean();
-
-                yield return new PhoneNumber(canonicalForm, isVerified, isPrimary);
+                foreach (var user in response.UsersValue)
+                {
+                    yield return user;
+                }
             }
         }
 
-        public class PhoneNumber
+        public async IAsyncEnumerable<OrgUnit> GetOrgUnitsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            public PhoneNumber(string value, bool isVerified, bool isPrimary)
+            using var service = new DirectoryService(Initializer);
+
+            var hasFetchedRootOrgUnit = false;
+
+            var response = await service.Orgunits
+                .List(Customer)
+                .ExecuteAsync(cancellationToken);
+
+            foreach (var orgUnit in response.OrganizationUnits)
             {
-                Value = value;
-                IsVerified = isVerified;
-                IsPrimary = isPrimary;
+                if (!hasFetchedRootOrgUnit && orgUnit.ParentOrgUnitPath.Equals("/"))
+                {
+                    yield return await service.Orgunits
+                        .Get(Customer, orgUnit.ParentOrgUnitId)
+                        .ExecuteAsync(cancellationToken);
+
+                    hasFetchedRootOrgUnit = true;
+                }
+
+                yield return orgUnit;
             }
+        }
 
-            public string Value { get; }
-
-            public bool IsVerified { get; }
-
-            public bool IsPrimary { get; }
+        private static GoogleCredential LoadCredential(string json)
+        {
+            return GoogleCredential.FromJson(json).CreateScoped(Scopes);
         }
     }
 }

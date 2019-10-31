@@ -6,7 +6,7 @@ namespace Cabinizer.Data
     {
         public User()
         {
-            Items = new List<Item>();
+            Items = new List<Cabin>();
         }
 
         public string Id { get; set; } = null!;
@@ -17,14 +17,14 @@ namespace Cabinizer.Data
 
         public string Email { get; set; } = null!;
 
-        public bool IsEmailVerified { get; set; }
-
         public string PhoneNumber { get; set; } = null!;
 
-        public bool IsPhoneNumberVerified { get; set; }
+        public string? PictureUrl { get; set; }
 
-        public string PictureUrl { get; set; } = null!;
+        public string OrganizationUnitPath { get; set; } = null!;
 
-        public ICollection<Item> Items { get; }
+        public OrganizationUnit OrganizationUnit { get; set; } = null!;
+
+        public ICollection<Cabin> Items { get; }
     }
 }

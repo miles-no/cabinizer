@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
@@ -7,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cabinizer.Controllers
 {
-    [ApiController]
     [Route("items")]
-    public class ItemController : ControllerBase
+    public class ItemController : ApiController
     {
         public ItemController(CabinizerContext context)
         {
@@ -19,9 +19,9 @@ namespace Cabinizer.Controllers
         private CabinizerContext Context { get; }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyCollection<Item>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IReadOnlyCollection<Cabin>>> GetAll(CancellationToken cancellationToken)
         {
-            return Ok(await Context.Items.ToListAsync(cancellationToken));
+            return Ok(await Context.Cabins.Where(x => User.OrgUnitPath.StartsWith(x.OrganizationUnitPath)).ToListAsync(cancellationToken));
         }
     }
 }

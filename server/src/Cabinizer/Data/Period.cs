@@ -9,9 +9,9 @@ namespace Cabinizer.Data
 
         public string Name { get; set; } = null!;
 
-        public Guid RaffleId { get; set; }
+        public Guid CabinId { get; set; }
 
-        public Raffle Raffle { get; set; } = null!;
+        public Cabin Cabin { get; set; } = null!;
 
         public LocalDateTime StartTime { get; set; }
 

@@ -14,9 +14,9 @@ namespace Cabinizer.Data
 
         public string Name { get; set; } = null!;
 
-        public Guid ItemId { get; set; }
+        public Guid CabinId { get; set; }
 
-        public Item Item { get; set; } = null!;
+        public Cabin Cabin { get; set; } = null!;
 
         public ICollection<Period> Periods { get; }
     }

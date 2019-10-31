@@ -10,16 +10,26 @@ namespace Cabinizer.Data
 
         public DbSet<User> Users { get; set; } = null!;
 
-        public DbSet<Item> Items { get; set; } = null!;
+        public DbSet<Cabin> Cabins { get; set; } = null!;
+
+        public DbSet<OrganizationUnit> OrganizationUnits { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasPostgresExtension("citext");
 
-            builder.UseSnakeCaseNamingConvention();
-
             builder.Entity<User>().HasIndex(x => x.Email).IsUnique();
             builder.Entity<User>().Property(x => x.Email).HasColumnType("citext");
+
+            builder.Entity<OrganizationUnit>().HasKey(x => x.Path);
+
+            builder.Entity<OrganizationUnit>()
+                .HasMany(x => x.Children)
+                .WithOne()
+                .HasForeignKey(x => x.ParentPath)
+                .IsRequired(false);
+
+            builder.UseSnakeCaseNamingConvention();
         }
     }
 }

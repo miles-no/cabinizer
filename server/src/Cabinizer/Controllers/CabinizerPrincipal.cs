@@ -23,7 +23,9 @@ namespace Cabinizer.Controllers
 
         public bool IsEmailVerified => Inner.ParseFirstValue<bool>(GoogleClaimTypes.EmailVerified, bool.TryParse);
 
-        public Uri PictureUrl => Inner.ParseFirstValue<Uri>(GoogleClaimTypes.Picture, TryParseUri);
+        public Uri? PictureUrl => Inner.ParseFirstValue<Uri?>(GoogleClaimTypes.Picture, TryParseUri);
+
+        public string OrgUnitPath => Inner.FindFirstValue(CustomClaimTypes.OrgUnitPath);
 
         private static bool TryParseUri(string value, out Uri? result) => Uri.TryCreate(value, UriKind.Absolute, out result);
     }

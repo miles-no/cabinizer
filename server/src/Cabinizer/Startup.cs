@@ -34,14 +34,19 @@ namespace Cabinizer
                 });
             });
 
+            services.AddMemoryCache();
             services.AddProblemDetails();
 
-            services.AddHttpClient<GoogleClient>();
+            services.AddSingleton<GoogleClient>();
+            services.AddScoped<GoogleUserImportService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(x => x.UseGoogle(
-                    clientId: Configuration["Auth:Google:ClientId"],
-                    hostedDomain: Configuration["Auth:Google:HostedDomain"]));
+                .AddJwtBearer(options =>
+                {
+                    options.UseGoogle(
+                        clientId: Configuration["Auth:Google:ClientId"],
+                        hostedDomain: Configuration["Auth:Google:HostedDomain"]);
+                });
 
             services.AddAuthorization(options =>
             {
@@ -80,6 +85,7 @@ namespace Cabinizer
 
             app.UseCors();
             app.UseAuthentication();
+            app.UseOrgUnitEnricher();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
