@@ -1,7 +1,6 @@
 (ns raffle.events
   (:require
     [day8.re-frame.tracing :refer-macros [fn-traced]]
-    [raffle.notifications.events :as notifications]
     [raffle.routing.fx :as routing]
     [raffle.utilities :refer [debug?]]
     [re-frame.core :as rf]
@@ -19,13 +18,14 @@
   ::init
   [interceptors]
   (fn-traced []
-    {::routing/start #(rf/dispatch [::view-changed %])
-     :dispatch       [::notifications/start {:default-show-duration 2000
-                                             :default-hide-duration 1000}]
-     :db             db/initial}))
+    {:db             db/initial}))
 
 (defn- view->fx [{:keys [id params]}]
   (case id
+    :phone-book {:http-xhrio {:method :get
+                              :uri (str service-url "/users")
+                              :response-format (ajax/json-response-format {:keywords? true})
+                              :on-success [::phone-book-received]}}
     :item (println (str "Fetching item " (:id params) " from the server..."))
     nil))
 
@@ -41,17 +41,23 @@
   ::user-loaded
   [interceptors]
   (fn-traced [{:keys [db]} [user]]
-    {:db (update db :user merge user)}))
+    {:db (update db :user merge user)
+     ::routing/start #(rf/dispatch [::view-changed %])}))
 
 (rf/reg-event-fx
   ::user-signed-in
   [interceptors]
   (fn-traced [{:keys [db]} [user]]
     {:db (assoc db :user user)
-     :http-xhrio {:method          :post
-                  :uri             (str service-url "/users?accessToken=" (:accessToken user))
+     :http-xhrio {:method          :get
+                  :uri             (str service-url "/users/me")
                   :headers         {:Authorization (str "Bearer " (:idToken user))}
-                  :format          (ajax/json-request-format)
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success      [::user-loaded]
                   :on-failure      [::load-user-failed]}}))
+
+(rf/reg-event-fx
+  ::phone-book-received
+  [interceptors]
+  (fn-traced [{:keys [db]} [phone-book]]
+    {:db (assoc db :phone-book phone-book)}))

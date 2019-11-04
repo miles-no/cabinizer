@@ -11,5 +11,5 @@
     (vec)))
 
 (def initial
-  {:view  {:id :index}
+  {:view  {:id :phone-book}
    :items test-items})

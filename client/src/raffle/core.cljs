@@ -18,11 +18,19 @@
     ["@material-ui/core/Snackbar" :default Snackbar]
     ["@material-ui/core/Avatar" :default Avatar]
     ["@material-ui/core/Button" :default Button]
+    ["@material-ui/core/Table" :default Table]
+    ["@material-ui/core/TableBody" :default TableBody]
+    ["@material-ui/core/TableCell" :default TableCell]
+    ["@material-ui/core/TableHead" :default TableHead]
+    ["@material-ui/core/TableRow" :default TableRow]
     ["@material-ui/core/Card" :default Card]
+    ["@material-ui/core/Paper" :default Paper]
+    ["@material-ui/core/FormControl" :default FormControl]
+    ["@material-ui/core/InputLabel" :default InputLabel]
+    ["@material-ui/core/Select" :default Select]
+    ["@material-ui/core/MenuItem" :default MenuItem]
     ["@material-ui/core/Grid" :default Grid]
     ["@material-ui/core/Link" :default Link]
-    [raffle.notifications.events :as notification-events]
-    [raffle.notifications.subs :as notification-subs]
     [raffle.utilities :refer [debug?]]
     [raffle.google-auth :as auth]
     [raffle.api :as api]
@@ -31,18 +39,21 @@
     [raffle.events :as events]
     [re-frame.core :as rf]
     [reagent.core :as r]
-    [day8.re-frame.http-fx]))
+    [day8.re-frame.http-fx]
+    [clojure.string :as str]))
 
 (defn style [theme]
-  #js {:icon        #js {:margin-right (.spacing theme 2)}
-       :cardGrid    #js {:padding-top    (.spacing theme 8)
-                         :padding-bottom (.spacing theme 8)}
-       :card        #js {:height         "100%"
-                         :display        :flex
-                         :flex-direction :column}
-       :grow        #js {:flex-grow 1}
-       :cardMedia   #js {:padding-top "56.25%"}
-       :cardContent #js {:flex-grow 1}})
+  #js {:icon         #js {:margin-right (.spacing theme 2)}
+       :toolbar      #js {:flex-wrap "wrap"}
+       :toolbarTitle #js {:flex-grow 1}
+       :link         #js {:margin (.spacing theme 1 1.5)}
+       :cardGrid     #js {:padding-top    (.spacing theme 8)
+                          :padding-bottom (.spacing theme 8)}
+       :card         #js {:height         "100%"
+                          :display        :flex
+                          :flex-direction :column}
+       :cardMedia    #js {:padding-top "56.25%"}
+       :cardContent  #js {:flex-grow 1}})
 
 (def theme
   #js {:palette #js {:primary   #js {:main "#B12F2A"}
@@ -61,9 +72,24 @@
       (let [props* (r/merge-props props
                                   {:on-click  -on-click
                                    :component Link
-                                   :target    "_blank"
                                    :href      location})]
         [:> Button props* children]))))
+
+(defn button-link [{:keys [to params query replace? target] :as props} children]
+  (let [navigate! (if replace? routing/replace! routing/navigate!)
+        self-target? (or (nil? target) (= target "_self"))
+        location (routing/resolve to params query)]
+    (letfn [(-on-click [event]
+              (let [left-button? (= (.-button event) 0)
+                    modified? (or (.-metaKey event) (.-altKey event) (.-ctrlKey event) (.-shiftKey event))]
+                (when (and left-button? self-target? (not modified?))
+                  (.preventDefault event)
+                  (navigate! to params query))))]
+      (let [props* (r/merge-props props
+                                  {:on-click -on-click
+                                   :variant  :button
+                                   :href     location})]
+        [:> Link props* children]))))
 
 (defn- raffle-item [{:keys [item ^js classes]}]
   [:> Grid
@@ -107,26 +133,104 @@
            :item    item
            :classes classes}])])))
 
-(def clicks (r/atom 0))
+(defn- phone-book-row [{:keys [entry ^js classes]}]
+  [:> TableRow
+   [:> TableCell
+    [:> Avatar
+     {:src (:pictureUrl entry)
+      :alt (:fullName entry)}]]
+   [:> TableCell
+    {:component :th
+     :scope     :row}
+    (str (:familyName entry) ", " (:givenName entry))]
+   [:> TableCell
+    [:a
+     {:href (str "mailto:" (:email entry))}
+     (:email entry)]]
+   [:> TableCell
+    [:a
+     {:href (str "tel:" (:phoneNumber entry))}
+     (:phoneNumber entry)]]
+   [:> TableCell (:organizationUnitPath entry)]])
+
+(defn- phone-book-style [theme]
+  #js {:paper        #js {:margin-top (.spacing theme 2)}
+       :tableWrapper #js {:max-height 600
+                          :overflow   "auto"}
+       :officeSelect #js {:min-width 200
+                          :margin    (.spacing theme 2)}})
+
+(defstyled phone-book phone-book-style [{:keys [^js classes]}]
+  (let [phone-book (rf/subscribe [::subs/phone-book])
+        office (r/atom nil)]
+    (fn [{:keys [^js classes]}]
+      [:> Paper
+       {:class (.-paper classes)}
+       [:> Toolbar
+        [:> FormControl
+         {:class (.-officeSelect classes)}
+         [:> InputLabel
+          {:id :office-select-label}
+          "Office"]
+         [:> Select
+          {:labelId       :office-select-label
+           :on-change     (fn [event]
+                            (let [value (.. event -target -value)]
+                              (reset! office value)))
+           :default-value @office}
+          [:> MenuItem {:value "/"} "All"]
+          [:> MenuItem {:value "/_Bergen"} "Bergen"]
+          [:> MenuItem {:value "/_Oslo"} "Oslo"]
+          [:> MenuItem {:value "/_Stavanger"} "Stavanger"]
+          [:> MenuItem {:value "/_Trondheim"} "Trondheim"]
+          [:> MenuItem {:value "/_Johannesburg"} "Johannesburg"]]]]
+       [:div
+        {:class (.-tableWrapper classes)}
+        [:> Table
+         {:stickyHeader true}
+         [:> TableHead
+          [:> TableRow
+           [:> TableCell "Picture"]
+           [:> TableCell "Name"]
+           [:> TableCell "Email"]
+           [:> TableCell "Phone No."]
+           [:> TableCell "Department"]]]
+         [:> TableBody
+          (let [office (or @office "/")
+                entries (filter
+                          (fn [entry]
+                            (str/starts-with? (:organizationUnitPath entry) office))
+                          @phone-book)]
+            (js/console.log office)
+            (for [{:keys [id] :as entry} entries]
+              [phone-book-row
+               {:key     id
+                :entry   entry
+                :classes classes}]))]]]])))
 
 (defn- app-bar [{:keys [^js classes]}]
   (let [user (rf/subscribe [::subs/user])]
     [:> AppBar
-     {:position :relative}
+     {:position :static
+      :color    :primary}
      [:> Toolbar
+      {:class (.-toolbar classes)}
       [icon/house
        {:class (.-icon classes)}]
       [:> Typography
        {:variant   :h5
-        :component :h1}
+        :component :h1
+        :class     (.-toolbarTitle classes)}
        "Cabinizer 3000"]
-      [:div {:class (.-grow classes)}]
+      [:nav
+       [button-link
+        {:color :inherit
+         :to    :phone-book
+         :class (.-link classes)}
+        "Phone Book"]]
       (if @user
         [:> IconButton
-         {:size     "small"
-          :on-click #(rf/dispatch [::notification-events/show
-                                   {:message (str "Hello " (swap! clicks inc))
-                                    :variant :info}])}
+         {:size "small"}
          [:> Avatar
           {:src (:pictureUrl @user)
            :alt (:name @user)}]]
@@ -145,50 +249,19 @@
                           (rf/dispatch [::events/user-signed-in user])))
           :on-failure #(js/console.log %)}])]]))
 
-(def variant-icons
-  {:success icon/check-circle
-   :warning icon/warning
-   :error   icon/error
-   :info    icon/info})
-
-(defn- notification-styles [theme]
-  #js {:success     #js {:background-color (aget green 600)}
-       :error       #js {:background-color (.. theme -palette -error -dark)}
-       :info        #js {:background-color (aget blue 600)}
-       :warning     #js {:background-color (aget amber 700)}
-       :iconVariant #js {:opacity      0.9
-                         :margin-right (.spacing theme 1)}
-       :message     #js {:display     "flex"
-                         :align-items "center"}})
-
-(defstyled notifications notification-styles [{:keys [^js classes]}]
-  (let [notification (rf/subscribe [::notification-subs/notification])
-        {:keys [open? variant] :or {variant :info}} @notification
-        icon (get variant-icons variant)]
-    [:> Snackbar
-     {:anchor-origin #js {:vertical   "bottom"
-                          :horizontal "left"}
-      :open          open?}
-     [:> SnackbarContent
-      (merge {:class (aget classes (name variant))}
-             (apply dissoc @notification [:open? :variant])
-             {:aria-describedby :client-snackbar
-              :message          (r/as-element [:span
-                                               {:id    :client-snackbar
-                                                :class (.-message classes)}
-                                               [icon {:class (.-iconVariant classes)}]
-                                               (:message @notification)])})]]))
-
 (defstyled app style [{:keys [^js classes]}]
-  [:> ThemeProvider
-   {:theme (create-theme theme)}
-   [:> CssBaseline]
-   [app-bar {:classes classes}]
-   [:main
-    [:> Container
-     {:max-width :md}
-     [notifications]
-     [card-grid {:classes classes}]]]])
+  (let [view (rf/subscribe [::subs/view])]
+    [:> ThemeProvider
+     {:theme (create-theme theme)}
+     [:> CssBaseline]
+     [app-bar {:classes classes}]
+     [:main
+      [:> Container
+       {:max-width :md}
+       (case (:id @view)
+         :index [card-grid {:classes classes}]
+         :phone-book [phone-book]
+         :else [:h1 "404 Not Found"])]]]))
 
 (defn- dev-setup []
   (when debug?

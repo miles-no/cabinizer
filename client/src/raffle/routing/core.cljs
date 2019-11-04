@@ -4,7 +4,8 @@
 
 (def ^:private router
   (bide/router [["/" :index]
-                ["/items/:id" :item]]))
+                ["/items/:id" :item]
+                ["/phone-book" :phone-book]]))
 
 (def navigate! (partial bide/navigate! router))
 
