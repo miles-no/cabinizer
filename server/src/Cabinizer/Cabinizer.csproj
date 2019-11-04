@@ -4,12 +4,18 @@
     <LangVersion>8.0</LangVersion>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UserSecretsId>0fff4cc0-436c-48df-a48d-174bbb352a81</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/c7d15e97-eff8-4f1b-99fd-69cc40c2e13c/resourcegroups/cabinizer/providers/microsoft.insights/components/cabinizer</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Admin.Directory.directory_v1" Version="1.41.1.1736" />
     <PackageReference Include="Hellang.Authentication.JwtBearer.Google" Version="2.0.0" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="4.0.0-beta.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 </Project>
