@@ -24,7 +24,14 @@ namespace Cabinizer
 
         public GoogleClient(IConfiguration configuration)
         {
-            var credential = LoadCredential(configuration["GoogleSecrets"]).CreateWithUser(AdminUserEmail);
+            var secretsJson = configuration["GoogleSecrets"];
+
+            if (string.IsNullOrEmpty(secretsJson))
+            {
+                return;
+            }
+
+            var credential = LoadCredential(secretsJson).CreateWithUser(AdminUserEmail);
 
             Initializer = new BaseClientService.Initializer
             {
@@ -33,10 +40,15 @@ namespace Cabinizer
             };
         }
 
-        private BaseClientService.Initializer Initializer { get; }
+        private BaseClientService.Initializer? Initializer { get; }
 
         public async IAsyncEnumerable<User> GetUsersAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
+            if (Initializer is null)
+            {
+                yield break;
+            }
+
             using var service = new DirectoryService(Initializer);
 
             var request = service.Users.List();
@@ -66,6 +78,11 @@ namespace Cabinizer
 
         public async IAsyncEnumerable<OrgUnit> GetOrgUnitsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
+            if (Initializer is null)
+            {
+                yield break;
+            }
+
             using var service = new DirectoryService(Initializer);
 
             var hasFetchedRootOrgUnit = false;
