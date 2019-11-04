@@ -19,7 +19,7 @@ namespace Cabinizer.Controllers
         private CabinizerContext Context { get; }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyCollection<Cabin>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IReadOnlyCollection<Cabin>>> GetAllItems(CancellationToken cancellationToken)
         {
             return Ok(await Context.Cabins.Where(x => User.OrgUnitPath.StartsWith(x.OrganizationUnitPath)).ToListAsync(cancellationToken));
         }

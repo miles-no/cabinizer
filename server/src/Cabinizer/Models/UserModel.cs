@@ -1,14 +1,7 @@
-using System.Collections.Generic;
-
-namespace Cabinizer.Data
+﻿namespace Cabinizer.Models
 {
-    public class User
+    public class UserModel
     {
-        public User()
-        {
-            Items = new List<Cabin>();
-        }
-
         public string Id { get; set; } = null!;
 
         public string GivenName { get; set; } = null!;
@@ -24,9 +17,5 @@ namespace Cabinizer.Data
         public string? PictureUrl { get; set; }
 
         public string OrganizationUnitPath { get; set; } = null!;
-
-        public OrganizationUnit OrganizationUnit { get; set; } = null!;
-
-        public ICollection<Cabin> Items { get; }
     }
 }

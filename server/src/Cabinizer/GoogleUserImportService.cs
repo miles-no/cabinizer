@@ -103,6 +103,7 @@ namespace Cabinizer
                     Email = googleUser.PrimaryEmail,
                     GivenName = googleUser.Name.GivenName,
                     FamilyName = googleUser.Name.FamilyName,
+                    FullName = googleUser.Name.FullName,
                     PictureUrl = googleUser.ThumbnailPhotoUrl,
                     OrganizationUnitPath = googleUser.OrgUnitPath,
                     PhoneNumber = NormalizePhoneNumber(phoneNumber),
