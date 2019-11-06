@@ -77,7 +77,7 @@ namespace Cabinizer.Controllers
 
             foreach (var user in users)
             {
-                user.PictureUrl = Url.Action(nameof(GetUserPictureById), new { id = user.Id });
+                user.PictureUrl = Url.ActionLink(nameof(GetUserPictureById), values: new { id = user.Id });
             }
 
             return Ok(users);
