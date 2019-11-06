@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Cabinizer.Data;
 using Cabinizer.Models;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,6 +83,7 @@ namespace Cabinizer.Controllers
             return Ok(users);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}/picture")]
         public async Task<ActionResult> GetUserPictureById([FromRoute] string id, CancellationToken cancellationToken)
         {
