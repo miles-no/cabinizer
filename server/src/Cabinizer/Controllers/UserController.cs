@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -24,7 +23,6 @@ namespace Cabinizer.Controllers
                 Email = x.Email,
                 FullName = x.FullName,
                 GivenName = x.GivenName,
-                PictureUrl = x.PictureUrl,
                 FamilyName = x.FamilyName,
                 PhoneNumber = x.PhoneNumber,
                 OrganizationUnitPath = x.OrganizationUnitPath,

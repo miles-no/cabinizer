@@ -21,7 +21,7 @@ namespace Cabinizer.Data
 
         public string PhoneNumber { get; set; } = null!;
 
-        public string? PictureUrl { get; set; }
+        public string? CloudinaryPublicId { get; set; }
 
         public string OrganizationUnitPath { get; set; } = null!;
 

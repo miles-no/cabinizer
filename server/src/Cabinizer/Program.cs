@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -18,7 +17,9 @@ namespace Cabinizer
 
             await using var context = scope.ServiceProvider.GetRequiredService<CabinizerContext>();
 
-            await context.Database.MigrateAsync();
+            await context.Database.EnsureDeletedAsync();
+
+            await context.Database.EnsureCreatedAsync();
 
             var userImporter = scope.ServiceProvider.GetRequiredService<GoogleUserImportService>();
 
