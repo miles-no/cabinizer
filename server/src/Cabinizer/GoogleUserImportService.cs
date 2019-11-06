@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
+using Google.Apis.Admin.Directory.directory_v1.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using User = Cabinizer.Data.User;
 
 namespace Cabinizer
 {
@@ -53,23 +56,35 @@ namespace Cabinizer
                     continue;
                 }
 
-                var orgUnit = new OrganizationUnit
-                {
-                    Path = googleOrgUnit.OrgUnitPath,
-                    Name = googleOrgUnit.Name.TrimStart('_'),
-                    ParentPath = googleOrgUnit.ParentOrgUnitPath,
-                };
+                var orgUnit = await Context.OrganizationUnits.FirstOrDefaultAsync(x => x.Path.Equals(googleOrgUnit.OrgUnitPath), cancellationToken);
 
-                await Context.OrganizationUnits.AddAsync(orgUnit, cancellationToken);
+                if (orgUnit is null)
+                {
+                    orgUnit = new OrganizationUnit
+                    {
+                        Path = googleOrgUnit.OrgUnitPath
+                    };
+
+                    await Context.OrganizationUnits.AddAsync(orgUnit, cancellationToken);
+                }
+
+                orgUnit.Name = googleOrgUnit.Name.TrimStart('_');
+                orgUnit.ParentPath = googleOrgUnit.ParentOrgUnitPath;
+
             }
 
-            var rootOrgUnit = new OrganizationUnit
-            {
-                Path = "/",
-                Name = "Miles",
-            };
+            var hasRootOrgUnit = await Context.OrganizationUnits.AnyAsync(x => x.Path.Equals("/"), cancellationToken);
 
-            await Context.OrganizationUnits.AddAsync(rootOrgUnit, cancellationToken);
+            if (!hasRootOrgUnit)
+            {
+                var rootOrgUnit = new OrganizationUnit
+                {
+                    Path = "/",
+                    Name = "Miles",
+                };
+
+                await Context.OrganizationUnits.AddAsync(rootOrgUnit, cancellationToken);
+            }
 
             var count = await Context.SaveChangesAsync(cancellationToken);
 
@@ -92,24 +107,25 @@ namespace Cabinizer
                     continue;
                 }
 
-                var phoneNumber = googleUser.Phones
-                    .OrderBy(x => x.Primary)
-                    .Select(x => x.Value)
-                    .FirstOrDefault();
+                var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(googleUser.Id), cancellationToken);
 
-                var user = new User
+                if (user is null)
                 {
-                    Id = googleUser.Id,
-                    Email = googleUser.PrimaryEmail,
-                    GivenName = googleUser.Name.GivenName,
-                    FamilyName = googleUser.Name.FamilyName,
-                    FullName = googleUser.Name.FullName,
-                    PictureUrl = googleUser.ThumbnailPhotoUrl,
-                    OrganizationUnitPath = googleUser.OrgUnitPath,
-                    PhoneNumber = NormalizePhoneNumber(phoneNumber),
-                };
+                    user = new User
+                    {
+                        Id = googleUser.Id
+                    };
 
-                await Context.Users.AddAsync(user, cancellationToken);
+                    await Context.Users.AddAsync(user, cancellationToken);
+                }
+
+                user.Email = googleUser.PrimaryEmail;
+                user.GivenName = googleUser.Name.GivenName;
+                user.FamilyName = googleUser.Name.FamilyName;
+                user.FullName = googleUser.Name.FullName;
+                user.PictureUrl = googleUser.ThumbnailPhotoUrl;
+                user.OrganizationUnitPath = googleUser.OrgUnitPath;
+                user.PhoneNumber = NormalizePhoneNumber(googleUser.Phones);
             }
 
             var count = await Context.SaveChangesAsync(cancellationToken);
@@ -117,8 +133,10 @@ namespace Cabinizer
             Logger.LogInformation("Imported {UserCount} user(s) from Google.", count);
         }
 
-        private static string NormalizePhoneNumber(string phoneNumber)
+        private static string NormalizePhoneNumber(IEnumerable<UserPhone> phones)
         {
+            var phoneNumber = phones.OrderBy(x => x.Primary).Select(x => x.Value).FirstOrDefault();
+
             if (string.IsNullOrEmpty(phoneNumber))
             {
                 return phoneNumber;
