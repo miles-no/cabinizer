@@ -18,7 +18,7 @@ namespace Cabinizer
 
         private static readonly string[] Scopes =
         {
-            DirectoryService.Scope.AdminDirectoryUserReadonly,
+            DirectoryService.Scope.AdminDirectoryUser,
             DirectoryService.Scope.AdminDirectoryOrgunitReadonly,
         };
 
