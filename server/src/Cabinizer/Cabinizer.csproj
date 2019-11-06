@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.8.0" />
     <PackageReference Include="Google.Apis.Admin.Directory.directory_v1" Version="1.42.0.1736" />
     <PackageReference Include="Hellang.Authentication.JwtBearer.Google" Version="2.0.0" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="4.0.0-beta.1" />

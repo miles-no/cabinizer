@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
 using Cabinizer.Models;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,9 +15,10 @@ namespace Cabinizer.Controllers
     [Route("users")]
     public class UserController : ApiController
     {
-        public UserController(CabinizerContext context)
+        public UserController(CabinizerContext context, Cloudinary cloudinary)
         {
             Context = context;
+            Cloudinary = cloudinary;
             MapToModel = x => new UserModel
             {
                 Id = x.Id,
@@ -30,6 +32,8 @@ namespace Cabinizer.Controllers
         }
 
         private CabinizerContext Context { get; }
+
+        private Cloudinary Cloudinary { get; }
 
         private Expression<Func<User, UserModel>> MapToModel { get; }
 
@@ -70,7 +74,43 @@ namespace Cabinizer.Controllers
                 .Select(MapToModel)
                 .ToListAsync(cancellationToken);
 
+            foreach (var user in users)
+            {
+                user.PictureUrl = Url.Action(nameof(GetUserPictureById), new { id = user.Id });
+            }
+
             return Ok(users);
+        }
+
+        [HttpGet("{id}/picture")]
+        public async Task<ActionResult> GetUserPictureById([FromRoute] string id, CancellationToken cancellationToken)
+        {
+            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrEmpty(user.CloudinaryPublicId))
+            {
+                // TODO: Redirect to placeholder image.
+                return NotFound();
+            }
+
+            var source = Uri.EscapeUriString(user.CloudinaryPublicId);
+
+            var uri = Cloudinary.Api.UrlImgUp
+                .Transform(new Transformation()
+                    .Crop("fill")
+                    .FetchFormat("auto")
+                    .Gravity("face", "center")
+                    .Width(260)
+                    .Height(260)
+                    .FetchFormat("jpg"))
+                .BuildUrl(source);
+
+            return Redirect(uri);
         }
     }
 }

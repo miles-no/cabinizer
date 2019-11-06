@@ -1,4 +1,5 @@
 using Cabinizer.Data;
+using CloudinaryDotNet;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +40,15 @@ namespace Cabinizer
 
             services.AddSingleton<GoogleClient>();
             services.AddScoped<GoogleUserImportService>();
+
+            services.AddSingleton(x =>
+            {
+                var cloudinary = Configuration.GetSection("Cloudinary");
+
+                var account = new Account(cloudinary["Cloud"], cloudinary["ApiKey"], cloudinary["ApiSecret"]);
+
+                return new Cloudinary(account);
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
