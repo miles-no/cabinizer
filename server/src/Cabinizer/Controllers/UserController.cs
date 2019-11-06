@@ -95,6 +95,7 @@ namespace Cabinizer.Controllers
                         .Width(260)
                         .Height(260)
                         .FetchFormat("png"))
+                    .Secure()
                     .BuildUrl(source);
             }
 
