@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Cabinizer.Data;
 using Cabinizer.Models;
 using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +27,7 @@ namespace Cabinizer.Controllers
                 GivenName = x.GivenName,
                 FamilyName = x.FamilyName,
                 PhoneNumber = x.PhoneNumber,
+                CloudinaryPublicId = x.CloudinaryPublicId,
                 OrganizationUnitPath = x.OrganizationUnitPath,
             };
         }
@@ -77,42 +77,28 @@ namespace Cabinizer.Controllers
 
             foreach (var user in users)
             {
-                user.PictureUrl = Url.ActionLink(nameof(GetUserPictureById), values: new { id = user.Id });
+                var publicId = user.CloudinaryPublicId;
+
+                if (string.IsNullOrEmpty(publicId))
+                {
+                    // TODO: Fix this placeholder image.
+                    user.PictureUrl = "https://www.miles.no/wp-content/themes/miles/image/male.png";
+                    continue;
+                }
+
+                var source = Uri.EscapeUriString(publicId);
+
+                user.PictureUrl = Cloudinary.Api.UrlImgUp
+                    .Transform(new Transformation()
+                        .Crop("fill")
+                        .Gravity("face", "center")
+                        .Width(260)
+                        .Height(260)
+                        .FetchFormat("png"))
+                    .BuildUrl(source);
             }
 
             return Ok(users);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("{id}/picture")]
-        public async Task<ActionResult> GetUserPictureById([FromRoute] string id, CancellationToken cancellationToken)
-        {
-            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
-
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrEmpty(user.CloudinaryPublicId))
-            {
-                // TODO: Redirect to placeholder image.
-                return NotFound();
-            }
-
-            var source = Uri.EscapeUriString(user.CloudinaryPublicId);
-
-            var uri = Cloudinary.Api.UrlImgUp
-                .Transform(new Transformation()
-                    .Crop("fill")
-                    .FetchFormat("auto")
-                    .Gravity("face", "center")
-                    .Width(260)
-                    .Height(260)
-                    .FetchFormat("jpg"))
-                .BuildUrl(source);
-
-            return Redirect(uri);
         }
     }
 }

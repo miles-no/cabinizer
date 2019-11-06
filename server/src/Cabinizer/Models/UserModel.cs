@@ -14,6 +14,8 @@
 
         public string PhoneNumber { get; set; } = null!;
 
+        public string? CloudinaryPublicId { get; set; }
+
         public string? PictureUrl { get; set; }
 
         public string OrganizationUnitPath { get; set; } = null!;
