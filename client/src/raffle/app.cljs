@@ -26,14 +26,7 @@
   #js {:icon         #js {:margin-right (.spacing theme 2)}
        :toolbar      #js {:flex-wrap "wrap"}
        :toolbarTitle #js {:flex-grow 1}
-       :link         #js {:margin (.spacing theme 1 1.5)}
-       :cardGrid     #js {:padding-top    (.spacing theme 8)
-                          :padding-bottom (.spacing theme 8)}
-       :card         #js {:height         "100%"
-                          :display        :flex
-                          :flex-direction :column}
-       :cardMedia    #js {:padding-top "56.25%"}
-       :cardContent  #js {:flex-grow 1}})
+       :link         #js {:margin (.spacing theme 1 1.5)}})
 
 (def theme
   #js {:palette #js {:primary   #js {:main "#B12F2A"}
@@ -41,18 +34,18 @@
 
 (declare app-bar)
 
-(defstyled render style [{:keys [^js classes]}]
+(defstyled render style [{:keys [^js classes] :as props}]
   (let [view (rf/subscribe [::subs/view])]
     [:> ThemeProvider
      {:theme (create-theme theme)}
      [:> CssBaseline]
-     [app-bar {:classes classes}]
+     [app-bar props]
      [:main
       [:> Container
        {:max-width :md}
        (case (:id @view)
-         :index [index/card-grid {:classes classes}]
-         :phone-book [phone-book/phone-book]
+         :index [index/render]
+         :phone-book [phone-book/render]
          [:h1 "404 Not Found"])]]]))
 
 (defn- app-bar [{:keys [^js classes]}]

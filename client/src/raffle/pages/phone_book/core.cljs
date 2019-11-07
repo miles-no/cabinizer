@@ -21,9 +21,9 @@
     [re-frame.core :as rf]
     [reagent.core :as r]))
 
-(declare phone-book-entry)
+(declare entry)
 
-(defn- phone-book-style [theme]
+(defn- style [theme]
   #js {:paper         #js {:margin-top (.spacing theme 2)}
        :loaderWrapper #js {:height          700
                            :display         "flex"
@@ -37,7 +37,7 @@
        :officeSelect  #js {:min-width 200
                            :margin    (.spacing theme 2)}})
 
-(defstyled phone-book phone-book-style [{:keys [^js classes]}]
+(defstyled render style [{:keys [^js classes]}]
   (let [users (rf/subscribe [::subs/users])
         page-number (r/atom 1)
         page-size (r/atom 25)
@@ -80,10 +80,10 @@
               [:> TableCell "Phone No."]
               [:> TableCell "Department"]]]
             [:> TableBody
-             (for [{:keys [id] :as entry} (:items @users)]
-               [phone-book-entry
+             (for [{:keys [id] :as user} (:items @users)]
+               [entry
                 {:key     id
-                 :entry   entry
+                 :user    user
                  :classes classes}])]]]
           [:> TablePagination
            {:count               (:totalItemCount @users)
@@ -107,22 +107,23 @@
            {:class (.-loaderText classes)}
            "Loading phone book..."]])])))
 
-(defn- phone-book-entry [{:keys [entry ^js classes]}]
+(defn- entry [{:keys [user ^js classes]}]
   [:> TableRow
    [:> TableCell
     [:> Avatar
-     {:src (str (:pictureUrl entry) "?size=40")
-      :alt (:fullName entry)}]]
+     {:src (str (:pictureUrl user) "?size=40")
+      :alt (:fullName user)}]]
    [:> TableCell
     {:component :th
      :scope     :row}
-    (str (:familyName entry) ", " (:givenName entry))]
+    (str (:familyName user) ", " (:givenName user))]
    [:> TableCell
     [:a
-     {:href (str "mailto:" (:email entry))}
-     (:email entry)]]
+     {:href (str "mailto:" (:email user))}
+     (:email user)]]
    [:> TableCell
     [:a
-     {:href (str "tel:" (:phoneNumber entry))}
-     (:phoneNumber entry)]]
-   [:> TableCell (:department entry)]])
+     {:href (str "tel:" (:phoneNumber user))}
+     (:phoneNumber user)]]
+   [:> TableCell
+    (:department user)]])

@@ -1,4 +1,5 @@
 (ns raffle.pages.index.core
+  (:require-macros [raffle.macros :refer [defstyled]])
   (:require
     ["@material-ui/core/CardActions" :default CardActions]
     ["@material-ui/core/CardContent" :default CardContent]
@@ -16,7 +17,16 @@
 
 (declare link-button raffle-item)
 
-(defn card-grid [{:keys [^js classes]}]
+(defn style [theme]
+  #js {:cardGrid    #js {:padding-top    (.spacing theme 8)
+                         :padding-bottom (.spacing theme 8)}
+       :card        #js {:height         "100%"
+                         :display        :flex
+                         :flex-direction :column}
+       :cardMedia   #js {:padding-top "56.25%"}
+       :cardContent #js {:flex-grow 1}})
+
+(defstyled render style [{:keys [^js classes]}]
   (let [items (rf/subscribe [::subs/items])]
     (fn []
       [:> Grid
