@@ -77,14 +77,5 @@
         [auth/signin-button
          {:client-id  "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
           :on-success (fn [^js/gapi.auth2.GoogleUser user]
-                        (let [profile (.getBasicProfile user)
-                              auth-response (.getAuthResponse user true)
-                              user {:idToken     (.-id_token auth-response)
-                                    :accessToken (.-access_token auth-response)
-                                    :familyName  (.getFamilyName profile)
-                                    :givenName   (.getGivenName profile)
-                                    :pictureUrl  (.getImageUrl profile)
-                                    :email       (.getEmail profile)
-                                    :id          (.getId profile)}]
-                          (rf/dispatch [::events/user-signed-in user])))
+                        (rf/dispatch [::events/user-signed-in user]))
           :on-failure #(js/console.log %)}])]]))

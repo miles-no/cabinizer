@@ -41,11 +41,20 @@
 (rf/reg-event-fx
   ::user-signed-in
   [interceptors]
-  (fn [{:keys [db]} [user]]
-    {:db         (assoc db :user user)
-     :http-xhrio {:method          :get
-                  :uri             (api/service-url "/users/me")
-                  :headers         {:Authorization (str "Bearer " (:idToken user))}
-                  :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success      [::user-loaded]
-                  :on-failure      [::load-user-failed]}}))
+  (fn [{:keys [db]} [response]]
+    (let [profile (.getBasicProfile response)
+          auth-response (.getAuthResponse response true)
+          user {:idToken     (.-id_token auth-response)
+                :accessToken (.-access_token auth-response)
+                :familyName  (.getFamilyName profile)
+                :givenName   (.getGivenName profile)
+                :pictureUrl  (.getImageUrl profile)
+                :email       (.getEmail profile)
+                :id          (.getId profile)}]
+      {:db         (assoc db :user user)
+       :http-xhrio {:method          :get
+                    :uri             (api/service-url "/users/me")
+                    :headers         {:Authorization (str "Bearer " (:idToken user))}
+                    :response-format (ajax/json-response-format {:keywords? true})
+                    :on-success      [::user-loaded]
+                    :on-failure      [::load-user-failed]}})))
