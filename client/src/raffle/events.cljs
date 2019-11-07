@@ -1,18 +1,14 @@
 (ns raffle.events
   (:require
     [day8.re-frame.tracing :refer-macros [fn-traced]]
+    [raffle.pages.phone-book.events :as phone-book]
     [raffle.routing.fx :as routing]
-    [raffle.utilities :refer [debug?]]
     [re-frame.core :as rf]
+    [raffle.api :as api]
     [ajax.core :as ajax]
     [raffle.db :as db]))
 
 (def ^:private interceptors [rf/trim-v])
-
-(def ^:private service-url
-  (if debug?
-    "https://localhost:5001"
-    "https://cabinizer.azurewebsites.net"))
 
 (rf/reg-event-fx
   ::init
@@ -22,18 +18,9 @@
 
 (defn- view->fx [{:keys [id params]}]
   (case id
-    :phone-book {:dispatch [::fetch-phone-book]}
+    :phone-book {:dispatch [::phone-book/fetch-phone-book]}
     :item (println (str "Fetching item " (:id params) " from the server..."))
     nil))
-
-(rf/reg-event-fx
-  ::fetch-phone-book
-  [interceptors]
-  (fn-traced [_ [query]]
-   {:http-xhrio {:method :get
-                 :uri (str service-url "/users")
-                 :response-format (ajax/json-response-format {:keywords? true})
-                 :on-success [::phone-book-received]}}))
 
 (rf/reg-event-fx
   ::view-changed
@@ -56,14 +43,8 @@
   (fn-traced [{:keys [db]} [user]]
     {:db (assoc db :user user)
      :http-xhrio {:method          :get
-                  :uri             (str service-url "/users/me")
+                  :uri             (str api/service-url "/users/me")
                   :headers         {:Authorization (str "Bearer " (:idToken user))}
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success      [::user-loaded]
                   :on-failure      [::load-user-failed]}}))
-
-(rf/reg-event-fx
-  ::phone-book-received
-  [interceptors]
-  (fn-traced [{:keys [db]} [phone-book]]
-    {:db (assoc db :phone-book phone-book)}))

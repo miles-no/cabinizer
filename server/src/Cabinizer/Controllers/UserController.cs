@@ -71,9 +71,9 @@ namespace Cabinizer.Controllers
         {
             var query = Context.Users.Include(x => x.OrganizationUnit).AsQueryable();
 
-            if (!string.IsNullOrEmpty(model.OrganizationUnitPath))
+            if (!string.IsNullOrEmpty(model.OrgUnitPath))
             {
-                query = query.Where(x => x.OrganizationUnitPath.StartsWith(model.OrganizationUnitPath));
+                query = query.Where(x => x.OrganizationUnitPath.StartsWith(model.OrgUnitPath));
             }
 
             var users = await query

@@ -2,6 +2,6 @@
 {
     public class UserQueryModel : PagedQueryModel
     {
-        public string? OrganizationUnitPath { get; set; } = null!;
+        public string? OrgUnitPath { get; set; } = null!;
     }
 }
