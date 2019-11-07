@@ -29,4 +29,4 @@
 
 (defn enable-interceptors! []
   (swap! default-interceptors
-    (partial concat [pass-bearer-token])))
+         (partial concat [pass-bearer-token])))

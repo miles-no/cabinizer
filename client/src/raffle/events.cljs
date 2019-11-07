@@ -1,6 +1,5 @@
 (ns raffle.events
   (:require
-    [day8.re-frame.tracing :refer-macros [fn-traced]]
     [raffle.pages.phone-book.events :as phone-book]
     [raffle.pages.index.events :as index]
     [raffle.routing.fx :as routing]
@@ -14,8 +13,8 @@
 (rf/reg-event-fx
   ::init
   [interceptors]
-  (fn-traced []
-    {:db             db/initial}))
+  (fn []
+    {:db db/initial}))
 
 (defn- view->fx [{:keys [id params]}]
   (case id
@@ -27,7 +26,7 @@
 (rf/reg-event-fx
   ::view-changed
   [interceptors]
-  (fn-traced [{:keys [db]} [view]]
+  (fn [{:keys [db]} [view]]
     (merge
       {:db (assoc db :view view)}
       (view->fx view))))
@@ -35,15 +34,15 @@
 (rf/reg-event-fx
   ::user-loaded
   [interceptors]
-  (fn-traced [{:keys [db]} [user]]
-    {:db (update db :user merge user)
+  (fn [{:keys [db]} [user]]
+    {:db             (update db :user merge user)
      ::routing/start #(rf/dispatch [::view-changed %])}))
 
 (rf/reg-event-fx
   ::user-signed-in
   [interceptors]
-  (fn-traced [{:keys [db]} [user]]
-    {:db (assoc db :user user)
+  (fn [{:keys [db]} [user]]
+    {:db         (assoc db :user user)
      :http-xhrio {:method          :get
                   :uri             (api/service-url "/users/me")
                   :headers         {:Authorization (str "Bearer " (:idToken user))}

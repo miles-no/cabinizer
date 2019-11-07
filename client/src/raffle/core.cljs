@@ -2,11 +2,11 @@
   (:require
     [raffle.utilities :refer [debug?]]
     [raffle.events :as events]
+    [day8.re-frame.http-fx]
+    [re-frame.core :as rf]
     [raffle.app :as app]
     [raffle.api :as api]
-    [re-frame.core :as rf]
-    [reagent.core :as r]
-    [day8.re-frame.http-fx]))
+    [reagent.core :as r]))
 
 (defn- dev-setup []
   (when debug?
