@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Cabinizer.Data;
 using Cabinizer.Models;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -88,6 +89,7 @@ namespace Cabinizer.Controllers
             return Ok(users);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}/picture")]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
