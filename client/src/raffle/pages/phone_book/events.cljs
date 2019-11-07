@@ -12,7 +12,10 @@
   [interceptors]
   (fn-traced [_ [{:keys [page size orgUnitPath] :or {page 1, size 25, orgUnitPath "/"}}]]
              {:http-xhrio {:method          :get
-                           :uri             (str api/service-url "/users?page=" page "&size=" size "&orgUnitPath=" orgUnitPath)
+                           :uri             (api/service-url "/users"
+                                                             {:orgUnitPath orgUnitPath
+                                                              :page        page
+                                                              :size        size})
                            :response-format (ajax/json-response-format {:keywords? true})
                            :on-success      [::phone-book-received]}}))
 

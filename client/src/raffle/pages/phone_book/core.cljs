@@ -21,25 +21,7 @@
     [re-frame.core :as rf]
     [reagent.core :as r]))
 
-(defn- phone-book-entry [{:keys [entry ^js classes]}]
-  [:> TableRow
-   [:> TableCell
-    [:> Avatar
-     {:src (:pictureUrl entry)
-      :alt (:fullName entry)}]]
-   [:> TableCell
-    {:component :th
-     :scope     :row}
-    (str (:familyName entry) ", " (:givenName entry))]
-   [:> TableCell
-    [:a
-     {:href (str "mailto:" (:email entry))}
-     (:email entry)]]
-   [:> TableCell
-    [:a
-     {:href (str "tel:" (:phoneNumber entry))}
-     (:phoneNumber entry)]]
-   [:> TableCell (:department entry)]])
+(declare phone-book-entry)
 
 (defn- phone-book-style [theme]
   #js {:paper         #js {:margin-top (.spacing theme 2)}
@@ -124,3 +106,23 @@
           [:> Typography
            {:class (.-loaderText classes)}
            "Loading phone book..."]])])))
+
+(defn- phone-book-entry [{:keys [entry ^js classes]}]
+  [:> TableRow
+   [:> TableCell
+    [:> Avatar
+     {:src (str (:pictureUrl entry) "?size=40")
+      :alt (:fullName entry)}]]
+   [:> TableCell
+    {:component :th
+     :scope     :row}
+    (str (:familyName entry) ", " (:givenName entry))]
+   [:> TableCell
+    [:a
+     {:href (str "mailto:" (:email entry))}
+     (:email entry)]]
+   [:> TableCell
+    [:a
+     {:href (str "tel:" (:phoneNumber entry))}
+     (:phoneNumber entry)]]
+   [:> TableCell (:department entry)]])

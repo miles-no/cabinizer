@@ -43,7 +43,7 @@
   (fn-traced [{:keys [db]} [user]]
     {:db (assoc db :user user)
      :http-xhrio {:method          :get
-                  :uri             (str api/service-url "/users/me")
+                  :uri             (api/service-url "/users/me")
                   :headers         {:Authorization (str "Bearer " (:idToken user))}
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success      [::user-loaded]

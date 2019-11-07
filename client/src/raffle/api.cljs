@@ -2,15 +2,22 @@
   (:require
     [ajax.core :refer [to-interceptor default-interceptors]]
     [raffle.utilities :refer [debug?]]
+    [cemerick.url :refer [url]]
     [raffle.subs :as subs]
     [re-frame.core :as rf]))
 
 (def user (rf/subscribe [::subs/user]))
 
-(def service-url
-  (if debug?
-    "https://localhost:5001"
-    "https://cabinizer.azurewebsites.net"))
+(defn service-url
+  ([path] (service-url path nil))
+  ([path query]
+   (->
+     (if debug?
+       (url "https://localhost:5001")
+       (url "https://cabinizer.azurewebsites.net"))
+     (assoc :query query)
+     (assoc :path path)
+     (str))))
 
 (def pass-bearer-token
   (to-interceptor
