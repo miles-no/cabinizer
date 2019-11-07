@@ -38,14 +38,14 @@
                            :margin    (.spacing theme 2)}})
 
 (defstyled phone-book phone-book-style [{:keys [^js classes]}]
-  (let [phone-book (rf/subscribe [::subs/phone-book])
+  (let [users (rf/subscribe [::subs/users])
         page-number (r/atom 1)
         page-size (r/atom 25)
         office (r/atom "/")]
     (fn [{:keys [^js classes]}]
       [:> Paper
        {:class (.-paper classes)}
-       (if @phone-book
+       (if @users
          [:<>
           [:> Toolbar
            [:> FormControl
@@ -57,7 +57,7 @@
              {:labelId       :office-select-label
               :on-change     (fn [event]
                                (let [value (.. event -target -value)]
-                                 (rf/dispatch [::events/fetch-phone-book
+                                 (rf/dispatch [::events/fetch-users
                                                {:orgUnitPath (reset! office value)
                                                 :size        @page-size
                                                 :page        @page-number}])))
@@ -80,21 +80,21 @@
               [:> TableCell "Phone No."]
               [:> TableCell "Department"]]]
             [:> TableBody
-             (for [{:keys [id] :as entry} (:items @phone-book)]
+             (for [{:keys [id] :as entry} (:items @users)]
                [phone-book-entry
                 {:key     id
                  :entry   entry
                  :classes classes}])]]]
           [:> TablePagination
-           {:count               (:totalItemCount @phone-book)
-            :page                (dec (:pageNumber @phone-book))
+           {:count               (:totalItemCount @users)
+            :page                (dec (:pageNumber @users))
             :onChangePage        (fn [_ new-page]
-                                   (rf/dispatch [::events/fetch-phone-book
+                                   (rf/dispatch [::events/fetch-users
                                                  {:orgUnitPath @office
                                                   :size        @page-size
                                                   :page        (reset! page-number (inc new-page))}]))
             :onChangeRowsPerPage (fn [event]
-                                   (rf/dispatch [::events/fetch-phone-book
+                                   (rf/dispatch [::events/fetch-users
                                                  {:orgUnitPath @office
                                                   :size        (reset! page-size (.. event -target -value))
                                                   :page        (reset! page-number 1)}]))

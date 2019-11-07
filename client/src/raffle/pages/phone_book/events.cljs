@@ -8,7 +8,7 @@
 (def ^:private interceptors [rf/trim-v])
 
 (rf/reg-event-fx
-  ::fetch-phone-book
+  ::fetch-users
   [interceptors]
   (fn-traced [_ [{:keys [page size orgUnitPath] :or {page 1, size 25, orgUnitPath "/"}}]]
              {:http-xhrio {:method          :get
@@ -17,10 +17,10 @@
                                                               :page        page
                                                               :size        size})
                            :response-format (ajax/json-response-format {:keywords? true})
-                           :on-success      [::phone-book-received]}}))
+                           :on-success      [::users-received]}}))
 
 (rf/reg-event-fx
-  ::phone-book-received
+  ::users-received
   [interceptors]
-  (fn-traced [{:keys [db]} [phone-book]]
-             {:db (assoc db :phone-book phone-book)}))
+  (fn-traced [{:keys [db]} [users]]
+             {:db (assoc db :users users)}))

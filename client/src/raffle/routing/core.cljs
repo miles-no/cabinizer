@@ -3,7 +3,7 @@
   (:require [bide.core :as bide]))
 
 (def ^:private router
-  (bide/router [["/" :phone-book]
+  (bide/router [["/" :index]
                 ["/items/:id" :item]
                 ["/phone-book" :phone-book]]))
 

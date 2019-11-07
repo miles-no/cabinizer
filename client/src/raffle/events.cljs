@@ -2,6 +2,7 @@
   (:require
     [day8.re-frame.tracing :refer-macros [fn-traced]]
     [raffle.pages.phone-book.events :as phone-book]
+    [raffle.pages.index.events :as index]
     [raffle.routing.fx :as routing]
     [re-frame.core :as rf]
     [raffle.api :as api]
@@ -18,7 +19,8 @@
 
 (defn- view->fx [{:keys [id params]}]
   (case id
-    :phone-book {:dispatch [::phone-book/fetch-phone-book]}
+    :phone-book {:dispatch [::phone-book/fetch-users]}
+    :index {:dispatch [::index/fetch-items]}
     :item (println (str "Fetching item " (:id params) " from the server..."))
     nil))
 
