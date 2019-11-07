@@ -20,6 +20,6 @@
 
         public string Department { get; set; } = null!;
 
-        public string OrganizationUnitId { get; set; } = null!;
+        public string OrganizationUnitPath { get; set; } = null!;
     }
 }

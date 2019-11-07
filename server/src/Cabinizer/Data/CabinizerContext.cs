@@ -21,10 +21,12 @@ namespace Cabinizer.Data
             builder.Entity<User>().HasIndex(x => x.Email).IsUnique();
             builder.Entity<User>().Property(x => x.Email).HasColumnType("citext");
 
+            builder.Entity<OrganizationUnit>().HasKey(x => x.Path);
+
             builder.Entity<OrganizationUnit>()
                 .HasMany(x => x.Children)
                 .WithOne()
-                .HasForeignKey(x => x.ParentId)
+                .HasForeignKey(x => x.ParentPath)
                 .IsRequired(false);
 
             builder.UseSnakeCaseNamingConvention();

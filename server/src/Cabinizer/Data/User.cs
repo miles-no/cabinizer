@@ -23,7 +23,7 @@ namespace Cabinizer.Data
 
         public string? CloudinaryPublicId { get; set; }
 
-        public string OrganizationUnitId { get; set; } = null!;
+        public string OrganizationUnitPath { get; set; } = null!;
 
         public OrganizationUnit OrganizationUnit { get; set; } = null!;
 

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Cabinizer.Controllers;
 using Cabinizer.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +13,7 @@ namespace Cabinizer
     {
         /// <summary>
         /// <para>
-        /// Adds a middleware that will get the current user's OrganizationUnitId from the database
+        /// Adds a middleware that will get the current user's OrgUnitPath from the database
         /// and add it to the current <see cref="ClaimsPrincipal"/>. The value is cached in
         /// memory to avoid going to the database for every single call to the API.
         /// </para>
@@ -25,14 +24,14 @@ namespace Cabinizer
         /// other problems, so we'll stick with this solution for now. 
         /// </para>
         /// </summary>
-        public static IApplicationBuilder UseOrganizationUnitEnricher(this IApplicationBuilder app)
+        public static IApplicationBuilder UseOrgUnitPathEnricher(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<OrganizationUnitEnricherMiddleware>();
+            return app.UseMiddleware<OrgUnitPathEnricherMiddleware>();
         }
 
-        private class OrganizationUnitEnricherMiddleware
+        private class OrgUnitPathEnricherMiddleware
         {
-            public OrganizationUnitEnricherMiddleware(RequestDelegate next, IMemoryCache cache)
+            public OrgUnitPathEnricherMiddleware(RequestDelegate next, IMemoryCache cache)
             {
                 Next = next;
                 Cache = cache;
@@ -48,11 +47,11 @@ namespace Cabinizer
                 {
                     var user = new CabinizerPrincipal(httpContext.User);
 
-                    var orgUnitId = await Cache.GetOrCreateAsync(user.Id, entry => GetOrganizationUnitId(entry, context));
+                    var orgUnitPath = await Cache.GetOrCreateAsync(user.Id, entry => GetOrgUnitPath(entry, context));
 
                     var identity = new ClaimsIdentity("Cabinizer");
 
-                    identity.AddClaim(new Claim(CustomClaimTypes.OrgUnitId, orgUnitId));
+                    identity.AddClaim(new Claim(CustomClaimTypes.OrgUnitPath, orgUnitPath));
 
                     httpContext.User.AddIdentity(identity);
                 }
@@ -60,15 +59,15 @@ namespace Cabinizer
                 await Next(httpContext);
             }
 
-            private static async Task<string> GetOrganizationUnitId(ICacheEntry entry, CabinizerContext context)
+            private static async Task<string> GetOrgUnitPath(ICacheEntry entry, CabinizerContext context)
             {
                 var userId = (string) entry.Key;
 
                 var user = await context.Users
-                    .Select(x => new { x.Id, x.OrganizationUnitId })
+                    .Select(x => new { x.Id, OrgUnitPath = x.OrganizationUnitPath })
                     .SingleAsync(x => x.Id.Equals(userId));
 
-                return user.OrganizationUnitId;
+                return user.OrgUnitPath;
             }
         }
     }

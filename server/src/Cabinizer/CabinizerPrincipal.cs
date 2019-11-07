@@ -25,7 +25,7 @@ namespace Cabinizer
 
         public Uri? PictureUrl => Inner.ParseFirstValue<Uri?>(GoogleClaimTypes.Picture, TryParseUri);
 
-        public string OrganizationUnitId => Inner.FindFirstValue(CustomClaimTypes.OrgUnitId);
+        public string OrgUnitPath => Inner.FindFirstValue(CustomClaimTypes.OrgUnitPath);
 
         private static bool TryParseUri(string value, out Uri? result) => Uri.TryCreate(value, UriKind.Absolute, out result);
     }

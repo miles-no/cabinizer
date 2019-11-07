@@ -31,7 +31,7 @@ namespace Cabinizer.Controllers
                 PhoneNumber = x.PhoneNumber,
                 Department = x.OrganizationUnit.Name,
                 CloudinaryPublicId = x.CloudinaryPublicId,
-                OrganizationUnitId = x.OrganizationUnitId,
+                OrganizationUnitPath = x.OrganizationUnitPath,
             };
         }
 
@@ -71,9 +71,9 @@ namespace Cabinizer.Controllers
         {
             var query = Context.Users.Include(x => x.OrganizationUnit).AsQueryable();
 
-            if (!string.IsNullOrEmpty(model.OrganizationUnitId))
+            if (!string.IsNullOrEmpty(model.OrganizationUnitPath))
             {
-                query = query.Where(x => x.OrganizationUnitId.StartsWith(model.OrganizationUnitId));
+                query = query.Where(x => x.OrganizationUnitPath.StartsWith(model.OrganizationUnitPath));
             }
 
             var users = await query

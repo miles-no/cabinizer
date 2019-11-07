@@ -97,7 +97,7 @@ namespace Cabinizer
 
             app.UseCors();
             app.UseAuthentication();
-            app.UseOrganizationUnitEnricher();
+            app.UseOrgUnitPathEnricher();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

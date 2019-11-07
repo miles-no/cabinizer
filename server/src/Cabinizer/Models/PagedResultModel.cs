@@ -26,11 +26,4 @@ namespace Cabinizer.Models
 
         public bool HasNextPage => PageNumber < PageCount;
     }
-
-    public class PagedQueryModel
-    {
-        public int? Page { get; set; }
-
-        public int? Size { get; set; }
-    }
 }

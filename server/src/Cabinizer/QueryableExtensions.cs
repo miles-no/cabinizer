@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Cabinizer.Data;
 using Cabinizer.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,13 +9,6 @@ namespace Cabinizer
 {
     public static class QueryableExtensions
     {
-        public static Task<T> FindByIdAsync<T, TKey>(this IQueryable<T> source, TKey id, CancellationToken cancellationToken)
-            where T : Entity<TKey>
-            where TKey : notnull
-        {
-            return source.SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
-        }
-
         public static async Task<PagedResultModel<T>> PagedAsync<T>(this IQueryable<T> source, PagedQueryModel query, CancellationToken cancellationToken)
         {
             var totalItemCount = await source.CountAsync(cancellationToken);
