@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Cabinizer.Data;
 using Cabinizer.Models;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +40,9 @@ namespace Cabinizer.Controllers
         private Expression<Func<User, UserModel>> MapToModel { get; }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status302Found)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<UserModel>> GetUserById([FromRoute] string id, CancellationToken cancellationToken)
         {
             if (string.Equals(id, "me", StringComparison.OrdinalIgnoreCase))
@@ -60,6 +64,7 @@ namespace Cabinizer.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<UserModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<UserModel>>> GetAllUsers([FromQuery] UserQueryModel model, CancellationToken cancellationToken)
         {
             var query = Context.Users.AsQueryable();
@@ -84,6 +89,8 @@ namespace Cabinizer.Controllers
         }
 
         [HttpGet("{id}/picture")]
+        [ProducesResponseType(StatusCodes.Status302Found)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetUserPictureById([FromRoute] string id, [FromQuery] int? size, CancellationToken cancellationToken)
         {
             var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);

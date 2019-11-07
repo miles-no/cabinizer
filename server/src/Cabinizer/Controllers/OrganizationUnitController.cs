@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,8 @@ namespace Cabinizer.Controllers
         private CabinizerContext Context { get; }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyCollection<OrganizationUnit>>> GetAllOrgUnits(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IEnumerable<OrganizationUnit>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<OrganizationUnit>>> GetAllOrgUnits(CancellationToken cancellationToken)
         {
             return Ok(await Context.OrganizationUnits.ToListAsync(cancellationToken));
         }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cabinizer.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,8 @@ namespace Cabinizer.Controllers
         private CabinizerContext Context { get; }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyCollection<Cabin>>> GetAllItems(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IEnumerable<Cabin>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Cabin>>> GetAllItems(CancellationToken cancellationToken)
         {
             return Ok(await Context.Cabins.Where(x => User.OrgUnitPath.StartsWith(x.OrganizationUnitPath)).ToListAsync(cancellationToken));
         }
