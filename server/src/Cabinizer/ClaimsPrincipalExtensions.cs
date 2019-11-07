@@ -1,7 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace Cabinizer.Controllers
+namespace Cabinizer
 {
     public static class ClaimsPrincipalExtensions
     {

@@ -35,6 +35,8 @@ namespace Cabinizer
                 });
             });
 
+            services.AddApplicationInsightsTelemetry(Configuration);
+
             services.AddMemoryCache();
             services.AddProblemDetails();
 

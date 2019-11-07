@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using Hellang.Authentication.JwtBearer.Google;
 
-namespace Cabinizer.Controllers
+namespace Cabinizer
 {
     public class CabinizerPrincipal : ClaimsPrincipal
     {

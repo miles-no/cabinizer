@@ -77,29 +77,44 @@ namespace Cabinizer.Controllers
 
             foreach (var user in users)
             {
-                var publicId = user.CloudinaryPublicId;
-
-                if (string.IsNullOrEmpty(publicId))
-                {
-                    // TODO: Fix this placeholder image.
-                    user.PictureUrl = "https://www.miles.no/wp-content/themes/miles/image/male.png";
-                    continue;
-                }
-
-                var source = Uri.EscapeUriString(publicId);
-
-                user.PictureUrl = Cloudinary.Api.UrlImgUp
-                    .Transform(new Transformation()
-                        .Crop("fill")
-                        .Gravity("face", "center")
-                        .Width(260)
-                        .Height(260)
-                        .FetchFormat("png"))
-                    .Secure()
-                    .BuildUrl(source);
+                user.PictureUrl = Url.ActionLink(nameof(GetUserPictureById), values: new { id = user.Id });
             }
 
             return Ok(users);
+        }
+
+        [HttpGet("{id}/picture")]
+        public async Task<ActionResult> GetUserPictureById([FromRoute] string id, [FromQuery] int? size, CancellationToken cancellationToken)
+        {
+            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrEmpty(user.CloudinaryPublicId))
+            {
+                // TODO: Fix this placeholder image.
+                return Redirect("https://www.miles.no/wp-content/themes/miles/image/male.png");
+            }
+
+            var source = Uri.EscapeUriString(user.CloudinaryPublicId);
+
+            var finalSize = size ?? 260;
+
+            var transformation = new Transformation()
+                .Gravity("face", "center")
+                .FetchFormat("png")
+                .Height(finalSize)
+                .Width(finalSize)
+                .Crop("fill");
+
+            var pictureUrl = Cloudinary.Api.UrlImgUp
+                .Transform(transformation).Secure()
+                .BuildUrl(source);
+
+            return Redirect(pictureUrl);
         }
     }
 }
