@@ -3,14 +3,12 @@ using System.Collections.Generic;
 
 namespace Cabinizer.Data
 {
-    public class Raffle
+    public class Raffle : Entity<Guid>
     {
         public Raffle()
         {
             Periods = new List<Period>();
         }
-
-        public Guid Id { get; set; }
 
         public string Name { get; set; } = null!;
 

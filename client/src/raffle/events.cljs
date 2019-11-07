@@ -22,12 +22,18 @@
 
 (defn- view->fx [{:keys [id params]}]
   (case id
-    :phone-book {:http-xhrio {:method :get
-                              :uri (str service-url "/users")
-                              :response-format (ajax/json-response-format {:keywords? true})
-                              :on-success [::phone-book-received]}}
+    :phone-book {:dispatch [::fetch-phone-book]}
     :item (println (str "Fetching item " (:id params) " from the server..."))
     nil))
+
+(rf/reg-event-fx
+  ::fetch-phone-book
+  [interceptors]
+  (fn-traced [_ [query]]
+   {:http-xhrio {:method :get
+                 :uri (str service-url "/users")
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success [::phone-book-received]}}))
 
 (rf/reg-event-fx
   ::view-changed

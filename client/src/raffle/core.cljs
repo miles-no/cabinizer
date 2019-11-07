@@ -23,11 +23,13 @@
     ["@material-ui/core/TableCell" :default TableCell]
     ["@material-ui/core/TableHead" :default TableHead]
     ["@material-ui/core/TableRow" :default TableRow]
+    ["@material-ui/core/TablePagination" :default TablePagination]
     ["@material-ui/core/Card" :default Card]
     ["@material-ui/core/Paper" :default Paper]
     ["@material-ui/core/FormControl" :default FormControl]
     ["@material-ui/core/InputLabel" :default InputLabel]
     ["@material-ui/core/Select" :default Select]
+    ["@material-ui/core/CircularProgress" :default CircularProgress]
     ["@material-ui/core/MenuItem" :default MenuItem]
     ["@material-ui/core/Grid" :default Grid]
     ["@material-ui/core/Link" :default Link]
@@ -133,7 +135,7 @@
            :item    item
            :classes classes}])])))
 
-(defn- phone-book-row [{:keys [entry ^js classes]}]
+(defn- phone-book-entry [{:keys [entry ^js classes]}]
   [:> TableRow
    [:> TableCell
     [:> Avatar
@@ -151,62 +153,76 @@
     [:a
      {:href (str "tel:" (:phoneNumber entry))}
      (:phoneNumber entry)]]
-   [:> TableCell (:organizationUnitPath entry)]])
+   [:> TableCell (:department entry)]])
 
 (defn- phone-book-style [theme]
-  #js {:paper        #js {:margin-top (.spacing theme 2)}
-       :tableWrapper #js {:max-height 600
-                          :overflow   "auto"}
-       :officeSelect #js {:min-width 200
-                          :margin    (.spacing theme 2)}})
+  #js {:paper         #js {:margin-top (.spacing theme 2)}
+       :loaderWrapper #js {:height          600
+                           :display         "flex"
+                           :flex-wrap       "wrap"
+                           :flex-direction  "column"
+                           :justify-content "center"
+                           :align-items     "center"}
+       :loaderText    #js {:margin (.spacing theme 2)}
+       :tableWrapper  #js {:max-height 600
+                           :overflow   "auto"}
+       :officeSelect  #js {:min-width 200
+                           :margin    (.spacing theme 2)}})
 
 (defstyled phone-book phone-book-style [{:keys [^js classes]}]
   (let [phone-book (rf/subscribe [::subs/phone-book])
-        office (r/atom nil)]
+        office (r/atom "/")]
     (fn [{:keys [^js classes]}]
       [:> Paper
        {:class (.-paper classes)}
-       [:> Toolbar
-        [:> FormControl
-         {:class (.-officeSelect classes)}
-         [:> InputLabel
-          {:id :office-select-label}
-          "Office"]
-         [:> Select
-          {:labelId       :office-select-label
-           :on-change     (fn [event]
-                            (let [value (.. event -target -value)]
-                              (reset! office value)))
-           :default-value @office}
-          [:> MenuItem {:value "/"} "All"]
-          [:> MenuItem {:value "/_Bergen"} "Bergen"]
-          [:> MenuItem {:value "/_Oslo"} "Oslo"]
-          [:> MenuItem {:value "/_Stavanger"} "Stavanger"]
-          [:> MenuItem {:value "/_Trondheim"} "Trondheim"]
-          [:> MenuItem {:value "/_Johannesburg"} "Johannesburg"]]]]
-       [:div
-        {:class (.-tableWrapper classes)}
-        [:> Table
-         {:stickyHeader true}
-         [:> TableHead
-          [:> TableRow
-           [:> TableCell "Picture"]
-           [:> TableCell "Name"]
-           [:> TableCell "Email"]
-           [:> TableCell "Phone No."]
-           [:> TableCell "Department"]]]
-         [:> TableBody
-          (let [office (or @office "/")
-                entries (filter
-                          (fn [entry]
-                            (str/starts-with? (:organizationUnitPath entry) office))
-                          @phone-book)]
-            (js/console.log office)
-            (for [{:keys [id] :as entry} entries]
-              [phone-book-row
-               {:key     id
-                :entry   entry
-                :classes classes}]))]]]])))
+       (if @phone-book
+         [:<>
+          [:> Toolbar
+           [:> FormControl
+            {:class (.-officeSelect classes)}
+            [:> InputLabel
+             {:id :office-select-label}
+             "Office"]
+            [:> Select
+             {:labelId       :office-select-label
+              :on-change     (fn [event]
+                               (let [value (.. event -target -value)]
+                                 (reset! office value)))
+              :default-value @office}
+             [:> MenuItem {:value "/"} "All"]
+             [:> MenuItem {:value "/_Bergen"} "Bergen"]
+             [:> MenuItem {:value "/_Oslo"} "Oslo"]
+             [:> MenuItem {:value "/_Stavanger"} "Stavanger"]
+             [:> MenuItem {:value "/_Trondheim"} "Trondheim"]
+             [:> MenuItem {:value "/_Johannesburg"} "Johannesburg"]]]]
+          [:div
+           {:class (.-tableWrapper classes)}
+           [:> Table
+            {:stickyHeader true}
+            [:> TableHead
+             [:> TableRow
+              [:> TableCell "Picture"]
+              [:> TableCell "Name"]
+              [:> TableCell "Email"]
+              [:> TableCell "Phone No."]
+              [:> TableCell "Department"]]]
+            [:> TableBody
+             (for [{:keys [id] :as entry} (:items @phone-book)]
+               [phone-book-entry
+                {:key     id
+                 :entry   entry
+                 :classes classes}])]]]
+          [:> TablePagination
+           {:count       (:totalItemCount @phone-book)
+            :page        (dec (:pageNumber @phone-book))
+            :rowsPerPage 25
+            :component   :div}]]
+         [:div
+          {:class (.-loaderWrapper classes)}
+          [:> CircularProgress]
+          [:> Typography
+           {:class (.-loaderText classes)}
+           "Loading phone book..."]])])))
 
 (defn- app-bar [{:keys [^js classes]}]
   (let [user (rf/subscribe [::subs/user])]

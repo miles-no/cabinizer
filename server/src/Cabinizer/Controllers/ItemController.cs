@@ -23,7 +23,7 @@ namespace Cabinizer.Controllers
         [ProducesResponseType(typeof(IEnumerable<Cabin>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Cabin>>> GetAllItems(CancellationToken cancellationToken)
         {
-            return Ok(await Context.Cabins.Where(x => User.OrgUnitPath.StartsWith(x.OrganizationUnitPath)).ToListAsync(cancellationToken));
+            return Ok(await Context.Cabins.Where(x => User.OrganizationUnitId.StartsWith(x.OrganizationUnitId)).ToListAsync(cancellationToken));
         }
     }
 }

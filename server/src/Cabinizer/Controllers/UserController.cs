@@ -29,8 +29,9 @@ namespace Cabinizer.Controllers
                 GivenName = x.GivenName,
                 FamilyName = x.FamilyName,
                 PhoneNumber = x.PhoneNumber,
+                Department = x.OrganizationUnit.Name,
                 CloudinaryPublicId = x.CloudinaryPublicId,
-                OrganizationUnitPath = x.OrganizationUnitPath,
+                OrganizationUnitId = x.OrganizationUnitId,
             };
         }
 
@@ -66,22 +67,22 @@ namespace Cabinizer.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<UserModel>>> GetAllUsers([FromQuery] UserQueryModel model, CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResultModel<UserModel>>> GetAllUsers([FromQuery] UserQueryModel model, CancellationToken cancellationToken)
         {
-            var query = Context.Users.AsQueryable();
+            var query = Context.Users.Include(x => x.OrganizationUnit).AsQueryable();
 
-            if (!string.IsNullOrEmpty(model.OrgUnitPath))
+            if (!string.IsNullOrEmpty(model.OrganizationUnitId))
             {
-                query = query.Where(x => x.OrganizationUnitPath.StartsWith(model.OrgUnitPath));
+                query = query.Where(x => x.OrganizationUnitId.StartsWith(model.OrganizationUnitId));
             }
 
             var users = await query
                 .OrderBy(x => x.FamilyName)
                 .ThenBy(x => x.GivenName)
                 .Select(MapToModel)
-                .ToListAsync(cancellationToken);
+                .PagedAsync(model, cancellationToken);
 
-            foreach (var user in users)
+            foreach (var user in users.Items)
             {
                 user.PictureUrl = Url.ActionLink(nameof(GetUserPictureById), values: new { id = user.Id });
             }

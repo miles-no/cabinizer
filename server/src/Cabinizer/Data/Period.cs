@@ -3,10 +3,8 @@ using NodaTime;
 
 namespace Cabinizer.Data
 {
-    public class Period
+    public class Period : Entity<Guid>
     {
-        public Guid Id { get; set; }
-
         public string Name { get; set; } = null!;
 
         public Guid CabinId { get; set; }

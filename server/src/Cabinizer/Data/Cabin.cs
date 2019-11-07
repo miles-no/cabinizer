@@ -3,14 +3,12 @@ using System.Collections.Generic;
 
 namespace Cabinizer.Data
 {
-    public class Cabin
+    public class Cabin : Entity<Guid>
     {
         public Cabin()
         {
             Periods = new List<Period>();
         }
-
-        public Guid Id { get; set; }
 
         public string Name { get; set; } = null!;
 
@@ -18,7 +16,7 @@ namespace Cabinizer.Data
 
         public User AdminUser { get; set; } = null!;
 
-        public string OrganizationUnitPath { get; set; } = null!;
+        public string OrganizationUnitId { get; set; } = null!;
 
         public OrganizationUnit OrganizationUnit { get; set; } = null!;
 

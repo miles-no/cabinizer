@@ -2,6 +2,6 @@
 {
     public static class CustomClaimTypes
     {
-        public static string OrgUnitPath { get; } = "org_unit_path";
+        public static string OrgUnitId { get; } = "org_unit_path";
     }
 }

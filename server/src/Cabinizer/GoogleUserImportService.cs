@@ -66,30 +66,30 @@ namespace Cabinizer
                     continue;
                 }
 
-                var orgUnit = await Context.OrganizationUnits.FirstOrDefaultAsync(x => x.Path.Equals(googleOrgUnit.OrgUnitPath), cancellationToken);
+                var orgUnit = await Context.OrganizationUnits.FirstOrDefaultAsync(x => x.Id.Equals(googleOrgUnit.OrgUnitPath), cancellationToken);
 
                 if (orgUnit is null)
                 {
                     orgUnit = new OrganizationUnit
                     {
-                        Path = googleOrgUnit.OrgUnitPath
+                        Id = googleOrgUnit.OrgUnitPath
                     };
 
                     await Context.OrganizationUnits.AddAsync(orgUnit, cancellationToken);
                 }
 
                 orgUnit.Name = googleOrgUnit.Name.TrimStart('_');
-                orgUnit.ParentPath = googleOrgUnit.ParentOrgUnitPath;
+                orgUnit.ParentId = googleOrgUnit.ParentOrgUnitPath;
 
             }
 
-            var hasRootOrgUnit = await Context.OrganizationUnits.AnyAsync(x => x.Path.Equals("/"), cancellationToken);
+            var hasRootOrgUnit = await Context.OrganizationUnits.AnyAsync(x => x.Id.Equals("/"), cancellationToken);
 
             if (!hasRootOrgUnit)
             {
                 var rootOrgUnit = new OrganizationUnit
                 {
-                    Path = "/",
+                    Id = "/",
                     Name = "Miles",
                 };
 
@@ -133,7 +133,7 @@ namespace Cabinizer
                 user.GivenName = googleUser.Name.GivenName;
                 user.FamilyName = googleUser.Name.FamilyName;
                 user.FullName = googleUser.Name.FullName;
-                user.OrganizationUnitPath = googleUser.OrgUnitPath;
+                user.OrganizationUnitId = googleUser.OrgUnitPath;
                 user.PhoneNumber = NormalizePhoneNumber(googleUser.Phones);
 
                 if (publicIds.TryGetValue(googleUser.Id, out var publicId))

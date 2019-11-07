@@ -1,7 +1,7 @@
 ﻿namespace Cabinizer.Models
 {
-    public class UserQueryModel
+    public class UserQueryModel : PagedQueryModel
     {
-        public string? OrgUnitPath { get; set; } = null!;
+        public string? OrganizationUnitId { get; set; } = null!;
     }
 }

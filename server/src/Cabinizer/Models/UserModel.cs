@@ -18,6 +18,8 @@
 
         public string? PictureUrl { get; set; }
 
-        public string OrganizationUnitPath { get; set; } = null!;
+        public string Department { get; set; } = null!;
+
+        public string OrganizationUnitId { get; set; } = null!;
     }
 }
