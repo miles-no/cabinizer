@@ -24,8 +24,7 @@
 (declare entry)
 
 (defn- style [theme]
-  #js {:paper         #js {:margin-top (.spacing theme 2)}
-       :loaderWrapper #js {:height          700
+  #js {:loaderWrapper #js {:height          700
                            :display         "flex"
                            :flex-wrap       "wrap"
                            :flex-direction  "column"
@@ -44,7 +43,6 @@
         office (r/atom "/")]
     (fn [{:keys [^js classes]}]
       [:> Paper
-       {:class (.-paper classes)}
        (if @users
          [:<>
           [:> Toolbar

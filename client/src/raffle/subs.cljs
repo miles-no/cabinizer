@@ -1,5 +1,7 @@
 (ns raffle.subs
-  (:require [re-frame.core :as rf]))
+  (:require
+    [raffle.utilities :as utils]
+    [re-frame.core :as rf]))
 
 (rf/reg-sub
   ::view
@@ -10,3 +12,8 @@
   ::user
   (fn [db _]
     (get db :user)))
+
+(rf/reg-sub
+  ::loading?
+  (fn [db [_ key]]
+    (utils/loading? db key)))

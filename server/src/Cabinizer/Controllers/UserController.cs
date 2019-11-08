@@ -62,6 +62,8 @@ namespace Cabinizer.Controllers
                 return NotFound();
             }
 
+            user.PictureUrl = Url.ActionLink(nameof(GetUserPictureById), values: new { id = user.Id });
+
             return Ok(user);
         }
 

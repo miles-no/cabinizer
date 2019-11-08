@@ -3,6 +3,7 @@
     [raffle.pages.phone-book.events :as phone-book]
     [raffle.pages.index.events :as index]
     [raffle.routing.fx :as routing]
+    [raffle.utilities :as utils]
     [re-frame.core :as rf]
     [raffle.api :as api]
     [ajax.core :as ajax]
@@ -38,23 +39,41 @@
     {:db             (update db :user merge user)
      ::routing/start #(rf/dispatch [::view-changed %])}))
 
+(rf/reg-event-db
+  ::loading
+  [interceptors]
+  (fn [db [key loading?]]
+    (utils/set-loading db key loading?)))
+
+(rf/reg-event-fx
+  ::user-changed
+  [interceptors]
+  (fn [_ [user]]
+    (if-let [auth-response (.getAuthResponse user true)]
+      {:dispatch [::user-signed-in user (.-id_token auth-response)]}
+      {:dispatch [::user-signed-out]})))
+
 (rf/reg-event-fx
   ::user-signed-in
   [interceptors]
-  (fn [{:keys [db]} [response]]
-    (let [profile (.getBasicProfile response)
-          auth-response (.getAuthResponse response true)
-          user {:idToken     (.-id_token auth-response)
-                :accessToken (.-access_token auth-response)
-                :familyName  (.getFamilyName profile)
-                :givenName   (.getGivenName profile)
-                :pictureUrl  (.getImageUrl profile)
-                :email       (.getEmail profile)
-                :id          (.getId profile)}]
+  (fn [{:keys [db]} [user id-token]]
+    (let [profile (.getBasicProfile user)
+          user {:familyName (.getFamilyName profile)
+                :givenName  (.getGivenName profile)
+                :pictureUrl (.getImageUrl profile)
+                :email      (.getEmail profile)
+                :id         (.getId profile)
+                :idToken    id-token}]
       {:db         (assoc db :user user)
        :http-xhrio {:method          :get
                     :uri             (api/service-url "/users/me")
-                    :headers         {:Authorization (str "Bearer " (:idToken user))}
+                    :headers         {:Authorization (str "Bearer " id-token)}
                     :response-format (ajax/json-response-format {:keywords? true})
                     :on-success      [::user-loaded]
                     :on-failure      [::load-user-failed]}})))
+
+(rf/reg-event-db
+  ::user-signed-out
+  [interceptors]
+  (fn [db _]
+    (dissoc db :user)))

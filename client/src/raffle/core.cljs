@@ -1,6 +1,7 @@
 (ns raffle.core
   (:require
     [raffle.utilities :refer [debug?]]
+    [raffle.google-auth :as auth]
     [raffle.events :as events]
     [day8.re-frame.http-fx]
     [re-frame.core :as rf]
@@ -20,8 +21,13 @@
   (rf/clear-subscription-cache!)
   (mount-app))
 
+(def ^:private auth-options
+  {:client_id     "611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
+   :hosted_domain "miles.no"})
+
 (defn ^:export init! []
   (api/enable-interceptors!)
   (rf/dispatch-sync [::events/init])
+  (auth/load! auth-options)
   (dev-setup)
   (mount-app))
