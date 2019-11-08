@@ -32,16 +32,14 @@
   (a/go
     (a/<! (<load-script "https://apis.google.com/js/platform.js"))
     (a/<! (<cb js/gapi.load "auth2"))
-    (let [auth2 (a/<! (<promise js/gapi.auth2.init (clj->js opts)))]
-      (-> auth2
-          (.-currentUser)
-          (.listen #(rf/dispatch [::events/user-changed %])))
-      (when (-> auth2 (.-isSignedIn) (.get))
+    (let [^js/gapi.auth2.GoogleAuth auth2 (a/<! (<promise js/gapi.auth2.init (clj->js opts)))]
+      (.listen ^js (.-currentUser auth2) #(rf/dispatch [::events/user-changed %]))
+      (when (.get ^js (.-isSignedIn auth2))
         (a/<! (<promise #(.signIn auth2))))
       (rf/dispatch [::events/loading :auth false]))))
 
 (defn sign-in! []
-  (a/go (a/<! (<promise #(.signIn (js/gapi.auth2.getAuthInstance))))))
+  (a/go (a/<! (<promise #(.signIn ^js/gapi.auth2.GoogleAuth (js/gapi.auth2.getAuthInstance))))))
 
 (defn sign-out! []
-  (a/go (a/<! (<promise #(.signOut (js/gapi.auth2.getAuthInstance))))))
+  (a/go (a/<! (<promise #(.signOut ^js/gapi.auth2.GoogleAuth (js/gapi.auth2.getAuthInstance))))))

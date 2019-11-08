@@ -48,16 +48,16 @@
 (rf/reg-event-fx
   ::user-changed
   [interceptors]
-  (fn [_ [user]]
-    (if-let [auth-response (.getAuthResponse user true)]
+  (fn [_ [^js/gapi.auth2.GoogleUser user]]
+    (if-let [^js/gapi.auth2.AuthResponse auth-response (.getAuthResponse user true)]
       {:dispatch [::user-signed-in user (.-id_token auth-response)]}
       {:dispatch [::user-signed-out]})))
 
 (rf/reg-event-fx
   ::user-signed-in
   [interceptors]
-  (fn [{:keys [db]} [user id-token]]
-    (let [profile (.getBasicProfile user)
+  (fn [{:keys [db]} [^js/gapi.auth2.GoogleUser user id-token]]
+    (let [^js/gapi.auth2.BasicProfile profile (.getBasicProfile user)
           user {:familyName (.getFamilyName profile)
                 :givenName  (.getGivenName profile)
                 :pictureUrl (.getImageUrl profile)
