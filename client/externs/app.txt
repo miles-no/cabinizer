@@ -1,0 +1,7 @@
+## Google Auth APIs
+global:gapi
+isSignedIn
+listen
+currentUser
+signIn
+getAuthInstance
