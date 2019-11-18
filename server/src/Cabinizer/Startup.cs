@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NodaTime;
 using Npgsql;
 
 namespace Cabinizer
@@ -40,8 +41,9 @@ namespace Cabinizer
             services.AddMemoryCache();
             services.AddProblemDetails();
 
-            services.AddSingleton<GoogleClient>();
+            services.AddSingleton<IClock>(SystemClock.Instance);
             services.AddScoped<GoogleUserImportService>();
+            services.AddSingleton<GoogleClient>();
 
             services.AddSingleton(x =>
             {

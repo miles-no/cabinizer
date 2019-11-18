@@ -21,6 +21,8 @@ namespace Cabinizer
 
             await context.Database.EnsureCreatedAsync();
 
+            await context.SeedAsync();
+
             var userImporter = scope.ServiceProvider.GetRequiredService<GoogleUserImportService>();
 
             await userImporter.ImportUsersAsync(CancellationToken.None);

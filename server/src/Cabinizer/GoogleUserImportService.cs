@@ -19,7 +19,7 @@ namespace Cabinizer
     {
         static GoogleUserImportService()
         {
-            IgnoreOrgUnitPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "/Sluttet", "/" };
+            IgnoreOrgUnitPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "/Sluttet", Constants.RootOrganizationUnitPath };
         }
 
         public GoogleUserImportService(GoogleClient google, CabinizerContext context, IHostEnvironment environment, ILogger<GoogleUserImportService> logger)
@@ -44,6 +44,9 @@ namespace Cabinizer
         {
             try
             {
+                // Make sure we set the system user so CreatedBy/UpdatedBy is set correctly.
+                Context.CurrentUser = CabinizerPrincipal.System;
+
                 await ImportOrgUnits(cancellationToken);
 
                 var mapping = await ReadCloudinaryMapping(FileProvider, cancellationToken);
@@ -81,19 +84,6 @@ namespace Cabinizer
                 orgUnit.Name = googleOrgUnit.Name.TrimStart('_');
                 orgUnit.ParentPath = googleOrgUnit.ParentOrgUnitPath;
 
-            }
-
-            var hasRootOrgUnit = await Context.OrganizationUnits.AnyAsync(x => x.Path.Equals("/"), cancellationToken);
-
-            if (!hasRootOrgUnit)
-            {
-                var rootOrgUnit = new OrganizationUnit
-                {
-                    Path = "/",
-                    Name = "Miles",
-                };
-
-                await Context.OrganizationUnits.AddAsync(rootOrgUnit, cancellationToken);
             }
 
             var count = await Context.SaveChangesAsync(cancellationToken);

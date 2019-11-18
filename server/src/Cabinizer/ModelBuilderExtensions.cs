@@ -49,7 +49,7 @@ namespace Cabinizer
                 .Append("_")
                 .Append(key.PrincipalEntityType.GetTableName())
                 .Append("_")
-                .AppendJoin("_", key.PrincipalKey.Properties.Select(p => p.GetColumnName()))
+                .AppendJoin("_", key.Properties.Select(p => p.GetColumnName()))
                 .Append("_fkey")
                 .ToString();
 

@@ -6,12 +6,25 @@ namespace Cabinizer
 {
     public class CabinizerPrincipal : ClaimsPrincipal
     {
+        static CabinizerPrincipal()
+        {
+            var identity = new ClaimsIdentity("System");
+
+            identity.AddClaim(new Claim(GoogleClaimTypes.Sub, Constants.SystemUserId));
+
+            var principal = new ClaimsPrincipal(identity);
+
+            System = new CabinizerPrincipal(principal);
+        }
+
         public CabinizerPrincipal(ClaimsPrincipal inner) : base(inner)
         {
             Inner = inner;
         }
 
         private ClaimsPrincipal Inner { get; }
+
+        public static CabinizerPrincipal System { get; }
 
         public string Id => Inner.FindFirstValue(GoogleClaimTypes.Sub);
         

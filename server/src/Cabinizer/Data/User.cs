@@ -1,15 +1,15 @@
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Cabinizer.Data
 {
-    public class User
+    public class User : Entity<string>
     {
         public User()
         {
-            Items = new List<Cabin>();
+            Items = new List<Item>();
         }
-
-        public string Id { get; set; } = null!;
 
         public string GivenName { get; set; } = null!;
 
@@ -27,6 +27,21 @@ namespace Cabinizer.Data
 
         public OrganizationUnit OrganizationUnit { get; set; } = null!;
 
-        public ICollection<Cabin> Items { get; }
+        public ICollection<Item> Items { get; }
+
+        public class Configuration : Configuration<User>
+        {
+            protected override void Configure(EntityTypeBuilder<User> builder)
+            {
+                builder.HasIndex(x => x.Email).IsUnique();
+
+                builder.Property(x => x.Email).HasColumnType("citext");
+
+                builder.HasOne(x => x.OrganizationUnit)
+                    .WithMany()
+                    .HasForeignKey(x => x.OrganizationUnitPath)
+                    .IsRequired();
+            }
+        }
     }
 }

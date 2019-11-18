@@ -1,23 +1,33 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Cabinizer.Data
 {
-    public class Raffle
+    public class Raffle : Entity<Guid>
     {
         public Raffle()
         {
-            Periods = new List<Period>();
+            Bookings = new List<Booking>();
         }
-
-        public Guid Id { get; set; }
 
         public string Name { get; set; } = null!;
 
-        public Guid CabinId { get; set; }
+        public Guid ItemId { get; set; }
 
-        public Cabin Cabin { get; set; } = null!;
+        public Item Item { get; set; } = null!;
 
-        public ICollection<Period> Periods { get; }
+        public ICollection<Booking> Bookings { get; }
+
+        public class Configuration : Configuration<Raffle>
+        {
+            protected override void Configure(EntityTypeBuilder<Raffle> builder)
+            {
+                builder.HasOne(x => x.Item)
+                    .WithMany()
+                    .HasForeignKey(x => x.ItemId)
+                    .IsRequired();
+            }
+        }
     }
 }

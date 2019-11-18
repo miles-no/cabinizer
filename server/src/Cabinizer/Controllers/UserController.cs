@@ -17,10 +17,8 @@ namespace Cabinizer.Controllers
     [Route("users")]
     public class UserController : ApiController
     {
-        public UserController(CabinizerContext context, Cloudinary cloudinary)
+        static UserController()
         {
-            Context = context;
-            Cloudinary = cloudinary;
             MapToModel = x => new UserModel
             {
                 Id = x.Id,
@@ -35,11 +33,17 @@ namespace Cabinizer.Controllers
             };
         }
 
+        public UserController(CabinizerContext context, Cloudinary cloudinary)
+        {
+            Context = context;
+            Cloudinary = cloudinary;
+        }
+
+        private static Expression<Func<User, UserModel>> MapToModel { get; }
+
         private CabinizerContext Context { get; }
 
         private Cloudinary Cloudinary { get; }
-
-        private Expression<Func<User, UserModel>> MapToModel { get; }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status302Found)]
