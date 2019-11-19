@@ -15,14 +15,14 @@ using User = Cabinizer.Data.User;
 
 namespace Cabinizer
 {
-    public class GoogleUserImportService
+    public class GoogleImportService
     {
-        static GoogleUserImportService()
+        static GoogleImportService()
         {
             IgnoreOrgUnitPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "/Sluttet", Constants.RootOrganizationUnitPath };
         }
 
-        public GoogleUserImportService(GoogleClient google, CabinizerContext context, IHostEnvironment environment, ILogger<GoogleUserImportService> logger)
+        public GoogleImportService(GoogleClient google, CabinizerContext context, IHostEnvironment environment, ILogger<GoogleImportService> logger)
         {
             Google = google;
             Context = context;
@@ -34,7 +34,7 @@ namespace Cabinizer
 
         private CabinizerContext Context { get; }
 
-        private ILogger<GoogleUserImportService> Logger { get; }
+        private ILogger<GoogleImportService> Logger { get; }
 
         private IFileProvider FileProvider { get; }
 
@@ -44,9 +44,6 @@ namespace Cabinizer
         {
             try
             {
-                // Make sure we set the system user so CreatedBy/UpdatedBy is set correctly.
-                Context.CurrentUser = CabinizerPrincipal.System;
-
                 await ImportOrgUnits(cancellationToken);
 
                 var mapping = await ReadCloudinaryMapping(FileProvider, cancellationToken);
@@ -83,7 +80,6 @@ namespace Cabinizer
 
                 orgUnit.Name = googleOrgUnit.Name.TrimStart('_');
                 orgUnit.ParentPath = googleOrgUnit.ParentOrgUnitPath;
-
             }
 
             var count = await Context.SaveChangesAsync(cancellationToken);

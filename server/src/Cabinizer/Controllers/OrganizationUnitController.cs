@@ -39,6 +39,7 @@ namespace Cabinizer.Controllers
         public async Task<ActionResult<IEnumerable<OrganizationUnit>>> GetAllOrgUnits(CancellationToken cancellationToken)
         {
             return Ok(await Context.OrganizationUnits
+                .AsNoTracking()
                 .Select(MapToModel)
                 .ToListAsync(cancellationToken));
         }

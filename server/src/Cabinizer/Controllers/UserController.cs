@@ -58,6 +58,7 @@ namespace Cabinizer.Controllers
             }
 
             var user = await Context.Users
+                .AsNoTracking()
                 .Select(MapToModel)
                 .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
@@ -75,7 +76,10 @@ namespace Cabinizer.Controllers
         [ProducesResponseType(typeof(IEnumerable<UserModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResultModel<UserModel>>> GetAllUsers([FromQuery] UserQueryModel model, CancellationToken cancellationToken)
         {
-            var query = Context.Users.Include(x => x.OrganizationUnit).AsQueryable();
+            var query = Context.Users
+                .AsNoTracking()
+                .Include(x => x.OrganizationUnit)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(model.OrgUnitPath))
             {
@@ -102,7 +106,10 @@ namespace Cabinizer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetUserPictureById([FromRoute] string id, [FromQuery] int? size, CancellationToken cancellationToken)
         {
-            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+            var user = await Context.Users
+                .AsNoTracking()
+                .Select(x => new { x.Id, x.CloudinaryPublicId })
+                .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
             if (user is null)
             {

@@ -38,7 +38,8 @@ namespace Cabinizer.Controllers
         public async Task<ActionResult<IEnumerable<Item>>> GetAllItems(CancellationToken cancellationToken)
         {
             return Ok(await Context.Items
-                .Where(x => User.OrgUnitPath.StartsWith(x.OrganizationUnitPath))
+                .AsNoTracking()
+                .Where(x => EF.Functions.Like(x.OrganizationUnitPath, User.OrgUnitPath + "%"))
                 .Select(MapToModel)
                 .ToListAsync(cancellationToken));
         }

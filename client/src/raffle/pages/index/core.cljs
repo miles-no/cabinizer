@@ -73,7 +73,7 @@
       {:gutter-bottom true
        :variant       :h5
        :component     :h2}
-      (str "Item " (:id item))]
+      (:name item)]
      [:> Typography
       (:description item)]]
     [:> CardActions

@@ -42,7 +42,7 @@ namespace Cabinizer
             services.AddProblemDetails();
 
             services.AddSingleton<IClock>(SystemClock.Instance);
-            services.AddScoped<GoogleUserImportService>();
+            services.AddScoped<GoogleImportService>();
             services.AddSingleton<GoogleClient>();
 
             services.AddSingleton(x =>
