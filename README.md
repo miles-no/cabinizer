@@ -1,3 +1,3 @@
 ## Client
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3a901ff4-e646-4e37-8b81-d9fb9c926251/deploy-status)](https://app.netlify.com/sites/cabinizer/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e17f8d52-3797-400d-b6ae-de64109c26ab/deploy-status)](https://app.netlify.com/sites/cabinizer/deploys)
