@@ -1,19 +1,32 @@
-import React from "react";
+import React, {useState} from "react";
 import { GoogleLogin } from 'react-google-login';
+import Menu from "./layout/Menu";
 
-const responseGoogle = (response) => {
+
+const loginFailed = (response) => {
   console.log(response);
+
 }
 
 const App: React.FC = () => {
-  return <div><h1>Hello Cabinizer 3000</h1>
+  const [accessToken, setAccessToken] = useState(null);
+  const [profile, setProfile] = useState( null);
+  const loginSuccess = (response) => {
+    console.log(response);
+setAccessToken(response.access_token);
+setProfile(response.profileObj);
+  }
+
+  return <div>
+    <h1>Hello {profile? profile.name: "Cabinizer 3001"}</h1>
+    {/* <Menu/> */}
     <GoogleLogin
         clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
         hostedDomain="miles.no"
         buttonText="Login"
         autoLoad={true}
-        onSuccess={responseGoogle}
-        onFailure={responseGoogle}
+        onSuccess={loginSuccess}
+        onFailure={loginFailed}
         cookiePolicy={'single_host_origin'}
     />
   </div>;
