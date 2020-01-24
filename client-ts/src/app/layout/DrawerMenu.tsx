@@ -15,10 +15,10 @@ import {GoogleLogout} from "react-google-login";
 export function DrawerMenu(props: { classes: any; }) {
     const classes = props.classes;
     const menuItems = [
-        { text: 'Bookingkalender', icon: <TodayIcon />, to: 'bookingcalendar' },
-        { text: 'Mine bookinger', icon: <EventNoteIcon />, to: 'mybookings' },
-        { text: 'Handleliste', icon: <ListIcon />, to: 'shoppinglist' },
-        { text: 'Om hytten', icon: <FilterHdrIcon />, to: 'about' },
+        { text: 'Bookingkalender', icon: <TodayIcon />, to: '/bookingcalendar' },
+        { text: 'Mine bookinger', icon: <EventNoteIcon />, to: '/mybookings' },
+        { text: 'Handleliste', icon: <ListIcon />, to: '/shoppinglist' },
+        { text: 'Om hytten', icon: <FilterHdrIcon />, to: '/about' },
         { icon: <GoogleLogout clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com" />, to: '/'}
     ];
 
@@ -28,7 +28,7 @@ export function DrawerMenu(props: { classes: any; }) {
             <Divider />
             <List>
                 {menuItems.map(item => (
-                    <ListItem button key={item.text} component={NavLink} to={`/${item.to}`}>
+                    <ListItem button key={item.text} component={NavLink} to={item.to}>
                         <ListItemIcon>{item.icon}</ListItemIcon>
                         <ListItemText primary={item.text} />
                     </ListItem>

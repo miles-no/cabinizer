@@ -16,12 +16,10 @@ function Login() {
     }
 
     return (
-
         <GoogleLogin
             clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
             hostedDomain="miles.no"
             buttonText="Login"
-            autoLoad={true}
             onSuccess={loginSuccess}
             onFailure={loginFailed}
             cookiePolicy={'single_host_origin'}
