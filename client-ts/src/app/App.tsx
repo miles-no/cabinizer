@@ -1,10 +1,8 @@
-import React, { useState } from "react";
-import Layout from "./layout/Layout";
+import React from 'react';
+import Layout from './layout/Layout';
 
 const App: React.FC = () => {
-  return (
-    <Layout />
-  );
+  return <Layout />;
 };
 
 export default App;

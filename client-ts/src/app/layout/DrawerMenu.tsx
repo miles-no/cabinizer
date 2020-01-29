@@ -9,33 +9,38 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { NavLink } from 'react-router-dom';
-import Login from '../login/Login'
-import {GoogleLogout} from "react-google-login";
+import Login from '../login/Login';
+import { GoogleLogout } from 'react-google-login';
 
-export function DrawerMenu(props: { classes: any; }) {
-    const classes = props.classes;
-    const menuItems = [
-        { text: 'Bookingkalender', icon: <TodayIcon />, to: '/bookingcalendar' },
-        { text: 'Mine bookinger', icon: <EventNoteIcon />, to: '/mybookings' },
-        { text: 'Handleliste', icon: <ListIcon />, to: '/shoppinglist' },
-        { text: 'Om hytten', icon: <FilterHdrIcon />, to: '/about' },
-        { icon: <GoogleLogout clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com" />, to: '/'}
-    ];
+export function DrawerMenu(props: { classes: any }) {
+  const classes = props.classes;
+  const menuItems = [
+    { text: 'Bookingkalender', icon: <TodayIcon />, to: '/bookingcalendar' },
+    { text: 'Mine bookinger', icon: <EventNoteIcon />, to: '/mybookings' },
+    { text: 'Handleliste', icon: <ListIcon />, to: '/shoppinglist' },
+    { text: 'Om hytten', icon: <FilterHdrIcon />, to: '/about' },
+    {
+      icon: (
+        <GoogleLogout clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com" />
+      ),
+      to: '/',
+    },
+  ];
 
-    return (
-        <div>
-            <div className={classes.toolbar} />
-            <Divider />
-            <List>
-                {menuItems.map(item => (
-                    <ListItem button key={item.text} component={NavLink} to={item.to}>
-                        <ListItemIcon>{item.icon}</ListItemIcon>
-                        <ListItemText primary={item.text} />
-                    </ListItem>
-                ))}
-            </List>
-            <Divider />
-            <Login />
-        </div >
-    );
+  return (
+    <div>
+      <div className={classes.toolbar} />
+      <Divider />
+      <List>
+        {menuItems.map(item => (
+          <ListItem button key={item.text} component={NavLink} to={item.to}>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <Login />
+    </div>
+  );
 }
