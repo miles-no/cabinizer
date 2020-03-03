@@ -12,6 +12,7 @@ import { DrawerMenu } from './DrawerMenu';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import MyBookings from '../mybookings/MyBookings';
 import Booking from './../booking/Booking';
+import ShoppingList from './../shopping-list/ShoppingList';
 
 const drawerWidth = 240;
 
@@ -118,7 +119,7 @@ function Layout(props: { container?: any }) {
               <MyBookings />
             </Route>
             <Route path="/shoppinglist">
-              <h3>TODO shoppinglist component</h3>
+              <ShoppingList />
             </Route>
             <Route path="/about">
               <h3>TODO about component</h3>
