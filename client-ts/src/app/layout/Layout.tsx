@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { DrawerMenu } from './DrawerMenu';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import About from './../about/About';
 
 const drawerWidth = 240;
 
@@ -119,7 +120,7 @@ function Layout(props: { container?: any }) {
               <h3>TODO shoppinglist component</h3>
             </Route>
             <Route path="/about">
-              <h3>TODO about component</h3>
+              <About />
             </Route>
             <Route path="/">
               <h3>TODO home component</h3>
