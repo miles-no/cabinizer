@@ -11,6 +11,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { DrawerMenu } from './DrawerMenu';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import MyBookings from '../mybookings/MyBookings';
+import Booking from './../booking/Booking';
 
 const drawerWidth = 240;
 
@@ -110,8 +111,8 @@ function Layout(props: { container?: any }) {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <Switch>
-            <Route path="/booking">
-              <h3>TODO booking component</h3>
+            <Route path="/bookingcalendar">
+              <Booking />
             </Route>
             <Route path="/mybookings">
               <MyBookings />
