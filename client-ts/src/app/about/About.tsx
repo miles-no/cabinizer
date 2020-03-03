@@ -5,7 +5,7 @@ class About extends React.Component {
     return (
       <div>
         <h3>TODO About component</h3>
-        <p>Work in progress...</p>
+        <p>Work in progress by Eivinn...</p>
       </div>
     );
   }
