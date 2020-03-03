@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { DrawerMenu } from './DrawerMenu';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import MyBookings from '../mybookings/MyBookings';
 
 const drawerWidth = 240;
 
@@ -113,7 +114,7 @@ function Layout(props: { container?: any }) {
               <h3>TODO booking component</h3>
             </Route>
             <Route path="/mybookings">
-              <h3>TODO mybookings component</h3>
+              <MyBookings />
             </Route>
             <Route path="/shoppinglist">
               <h3>TODO shoppinglist component</h3>
