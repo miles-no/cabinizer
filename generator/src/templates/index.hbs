@@ -1,0 +1,29 @@
+{{#if exportCore}}
+
+export { ApiError } from '../core/ApiError';
+export { isSuccess } from '../core/isSuccess';
+{{/if}}
+{{#if exportModels}}
+{{#if models}}
+
+{{#each models}}
+export * from './models/{{{this}}}';
+{{/each}}
+{{/if}}
+{{/if}}
+{{#if exportSchemas}}
+{{#if models}}
+
+{{#each models}}
+export { ${{{this}}} } from './schemas/${{{this}}}';
+{{/each}}
+{{/if}}
+{{/if}}
+{{#if exportServices}}
+{{#if services}}
+
+{{#each services}}
+export { {{{this}}} } from './services/{{{this}}}';
+{{/each}}
+{{/if}}
+{{/if}}

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "parcel src/index.html --port 3000",
     "build": "parcel build src/index.html",
-    "format": "pretty-quick --staged \"src/**/*.{js,tsx,ts,css}\""
+    "format": "pretty-quick --staged \"src/**/*.{js,tsx,ts,css}\"",
+    "generate-services": "node generate.js"
   },
   "author": "",
   "license": "ISC",

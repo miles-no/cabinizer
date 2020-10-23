@@ -1,0 +1,9 @@
+interface Config {
+    BASE: string;
+    VERSION: string;
+}
+
+export const OpenAPI: Config = {
+    BASE: {{interpolation 'process.env' server}},
+    VERSION: '{{{version}}}',
+};

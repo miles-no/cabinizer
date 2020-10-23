@@ -1,0 +1,16 @@
+export const $User = {
+  id: {},
+  createdAt: {},
+  updatedAt: {},
+  createdBy: {},
+  updatedBy: {},
+  givenName: {},
+  familyName: {},
+  fullName: {},
+  email: {},
+  phoneNumber: {},
+  cloudinaryPublicId: {},
+  organizationUnitPath: {},
+  organizationUnit: {},
+  items: {},
+};

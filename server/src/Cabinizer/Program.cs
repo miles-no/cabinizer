@@ -64,8 +64,8 @@ namespace Cabinizer
             var cabin = new Item
             {
                 Id = new Guid("01042e92-a3ca-46f7-85ba-0f223f97224a"),
-                OrganizationUnitPath = "/_Stavanger",
-                Name = "Hytte, Tjørhom Panorama",
+                OrganizationUnitPath = "/",
+                Name = "Hytte, Tjï¿½rhom Panorama",
                 AdminUserId = Constants.SystemUserId,
             };
 

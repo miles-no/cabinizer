@@ -1,0 +1,13 @@
+{{#equals export 'interface'}}
+{{>typeInterface}}
+{{else equals export 'reference'}}
+{{>typeReference}}
+{{else equals export 'enum'}}
+{{>typeEnum}}
+{{else equals export 'array'}}
+{{>typeArray}}
+{{else equals export 'dictionary'}}
+{{>typeDictionary}}
+{{else}}
+{{>typeGeneric}}
+{{/equals}}
