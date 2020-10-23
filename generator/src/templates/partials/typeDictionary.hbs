@@ -1,0 +1,5 @@
+{{~#if link~}}
+Dictionary<{{>type link}}>{{>isNullable}}
+{{~else~}}
+Dictionary<{{{base}}}>{{>isNullable}}
+{{~/if~}}

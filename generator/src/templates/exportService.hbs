@@ -1,0 +1,106 @@
+/* eslint-disable */
+{{#if imports}}
+{{#each imports}}
+import { {{{this}}} } from '../models/{{{this}}}';
+{{/each}}
+{{/if}}
+
+{{#equals importContentType true}}
+import { ContentType } from '../../core/ContentType'; 
+{{/equals}}
+
+{{#if hasApiErrors}}
+import { ApiError, catchGenericError } from '../../core/ApiError';
+{{else}}
+import { catchGenericError } from '../../core/ApiError';
+{{/if}}
+import { request as __request } from '../../core/request';
+import { OpenAPI } from './settings';
+
+export class {{{name}}} {
+
+    {{#each operations}}
+    /**
+    {{#if deprecated}}
+     * @deprecated
+    {{/if}}
+    {{#if summary}}
+     * {{{summary}}}
+    {{/if}}
+    {{#if description}}
+     * {{{description}}}
+    {{/if}}
+    {{#if parameters}}
+    {{#each parameters}}
+     * @param {{{name}}} {{{description}}}
+    {{/each}}
+    {{/if}}
+    {{#each results}}
+     * @result {{{type}}} {{{description}}}
+    {{/each}}
+     * @throws ApiError
+     */
+    public static async {{{name}}}({{>parameters}}): Promise<{{>result}}> {
+
+        const result = await __request({
+            method: '{{{method}}}',
+            path: `{{{path}}}`,
+            {{#if parametersCookie~}}
+            cookies: {
+                {{#each parametersCookie}}
+                '{{{prop}}}': {{{name}}},
+                {{/each}}
+            },
+            {{/if}}
+            {{#if parametersHeader~}}
+            headers: {
+                {{#each parametersHeader}}
+                '{{{prop}}}': {{{name}}},
+                {{/each}}
+            },
+            {{/if}}
+            {{#if parametersQuery~}}
+            query: {
+                {{#each parametersQuery}}
+                '{{{prop}}}': {{{name}}},
+                {{/each}}
+            },
+            {{/if}}
+            {{#if parametersForm~}}
+            formData: {
+                {{#each parametersForm}}
+                '{{{prop}}}': {{{name}}},
+                {{/each}}
+            },
+            {{/if}}
+            {{#if parametersBody~}}
+            body: {{{parametersBody.name}}},
+            {{/if}}
+            {{#if responseHeader~}}
+            responseHeader: '{{{responseHeader}}}',
+            {{/if}}
+            basePath: OpenAPI.BASE,
+            {{#if isBinary}}
+            accept: acceptContentType,
+            responseType: 'arraybuffer'
+            {{/if}}
+            
+        });
+        {{#if errors}}
+
+        if (!result.ok) {
+            switch (result.status) {
+            {{#each errors}}
+                case {{{code}}}: throw new ApiError(result, `{{{description}}}`);
+            {{/each}}
+            }
+        }
+        {{/if}}
+
+        catchGenericError(result);
+
+        return result.body;
+    }
+
+    {{/each}}
+}

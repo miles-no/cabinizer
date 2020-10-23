@@ -1,0 +1,15 @@
+{{#if description}}
+/**
+ * {{{description}}}
+ */
+{{/if}}
+export enum {{{name}}} {
+    {{#each enum}}
+    {{#if description}}
+    /**
+     * {{{description}}}
+     */
+    {{/if}}
+    {{{name}}} = {{{value}}},
+    {{/each}}
+}

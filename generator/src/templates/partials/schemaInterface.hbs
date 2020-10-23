@@ -1,0 +1,15 @@
+{
+{{#if extends}}
+    {{#each extends}}
+        ...${{{this}}}.properties,
+    {{/each}}
+{{/if}}
+{{#if properties}}
+    {{#each properties}}
+        {{{name}}}: {{>schema}},
+    {{/each}}
+{{/if}}
+{{#if isRequired~}}
+    required: {{{isRequired}}},
+{{/if}}
+}

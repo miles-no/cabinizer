@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Cabinizer.Data;
 using CloudinaryDotNet;
 using Hellang.Middleware.ProblemDetails;
@@ -10,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Converters;
 using NodaTime;
 using Npgsql;
 
@@ -35,7 +38,7 @@ namespace Cabinizer
                     policy.WithMethods(HttpMethods.Get, HttpMethods.Put, HttpMethods.Post, HttpMethods.Delete);
                 });
             });
-
+            services.AddSwaggerGen(options => options.SchemaFilter<EnumSchemaFilter>());
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddMemoryCache();
@@ -80,12 +83,27 @@ namespace Cabinizer
             services.AddDbContext<CabinizerContext>(x => x.UseNpgsql(builder.ConnectionString, y => y.UseNodaTime()));
 
             services.AddMvcCore()
-                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true)
-                .ConfigureApiBehaviorOptions(options => options.SuppressMapClientErrors = true);
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    // options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(System.Text.Json, true));
+                })
+                .ConfigureApiBehaviorOptions(options => options.SuppressMapClientErrors = true)
+                .AddApiExplorer();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+            
             app.UseProblemDetails();
 
             if (!env.IsDevelopment())
