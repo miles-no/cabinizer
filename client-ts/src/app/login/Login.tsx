@@ -17,7 +17,7 @@ function Login() {
 
   return (
     <GoogleLogin
-      clientId="611538057711-dia11nhabvku7cgd0edubeupju1jf4rg.apps.googleusercontent.com"
+      clientId="423929329131-cqp6guna0ue32r9pd7qoe32lgncm7u0a.apps.googleusercontent.com"
       hostedDomain="miles.no"
       buttonText="Login"
       onSuccess={loginSuccess}
